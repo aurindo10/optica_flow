@@ -24,14 +24,26 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createFornecedorStmt, err = db.PrepareContext(ctx, createFornecedor); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateFornecedor: %w", err)
+	}
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
+	}
+	if q.deleteFornecedorByIdStmt, err = db.PrepareContext(ctx, deleteFornecedorById); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteFornecedorById: %w", err)
 	}
 	if q.deleteProductByIdStmt, err = db.PrepareContext(ctx, deleteProductById); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteProductById: %w", err)
 	}
+	if q.getAllFornecedoresStmt, err = db.PrepareContext(ctx, getAllFornecedores); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllFornecedores: %w", err)
+	}
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
+	}
+	if q.updateFornecedorStmt, err = db.PrepareContext(ctx, updateFornecedor); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateFornecedor: %w", err)
 	}
 	if q.updateProductStmt, err = db.PrepareContext(ctx, updateProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateProduct: %w", err)
@@ -41,9 +53,19 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createFornecedorStmt != nil {
+		if cerr := q.createFornecedorStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createFornecedorStmt: %w", cerr)
+		}
+	}
 	if q.createProductStmt != nil {
 		if cerr := q.createProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
+		}
+	}
+	if q.deleteFornecedorByIdStmt != nil {
+		if cerr := q.deleteFornecedorByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteFornecedorByIdStmt: %w", cerr)
 		}
 	}
 	if q.deleteProductByIdStmt != nil {
@@ -51,9 +73,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteProductByIdStmt: %w", cerr)
 		}
 	}
+	if q.getAllFornecedoresStmt != nil {
+		if cerr := q.getAllFornecedoresStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllFornecedoresStmt: %w", cerr)
+		}
+	}
 	if q.getAllProductsStmt != nil {
 		if cerr := q.getAllProductsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAllProductsStmt: %w", cerr)
+		}
+	}
+	if q.updateFornecedorStmt != nil {
+		if cerr := q.updateFornecedorStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateFornecedorStmt: %w", cerr)
 		}
 	}
 	if q.updateProductStmt != nil {
@@ -98,21 +130,29 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                    DBTX
-	tx                    *sql.Tx
-	createProductStmt     *sql.Stmt
-	deleteProductByIdStmt *sql.Stmt
-	getAllProductsStmt    *sql.Stmt
-	updateProductStmt     *sql.Stmt
+	db                       DBTX
+	tx                       *sql.Tx
+	createFornecedorStmt     *sql.Stmt
+	createProductStmt        *sql.Stmt
+	deleteFornecedorByIdStmt *sql.Stmt
+	deleteProductByIdStmt    *sql.Stmt
+	getAllFornecedoresStmt   *sql.Stmt
+	getAllProductsStmt       *sql.Stmt
+	updateFornecedorStmt     *sql.Stmt
+	updateProductStmt        *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                    tx,
-		tx:                    tx,
-		createProductStmt:     q.createProductStmt,
-		deleteProductByIdStmt: q.deleteProductByIdStmt,
-		getAllProductsStmt:    q.getAllProductsStmt,
-		updateProductStmt:     q.updateProductStmt,
+		db:                       tx,
+		tx:                       tx,
+		createFornecedorStmt:     q.createFornecedorStmt,
+		createProductStmt:        q.createProductStmt,
+		deleteFornecedorByIdStmt: q.deleteFornecedorByIdStmt,
+		deleteProductByIdStmt:    q.deleteProductByIdStmt,
+		getAllFornecedoresStmt:   q.getAllFornecedoresStmt,
+		getAllProductsStmt:       q.getAllProductsStmt,
+		updateFornecedorStmt:     q.updateFornecedorStmt,
+		updateProductStmt:        q.updateProductStmt,
 	}
 }

@@ -33,6 +33,31 @@ SET name = $2,
 FROM valid_fornecedor
 WHERE product.id = $10
 RETURNING *;
+
 -- name: DeleteProductById :exec
 DELETE FROM product
+WHERE id = $1;
+
+-- name: GetAllFornecedores :many
+SELECT * FROM fornecedor ORDER BY id ASC;
+
+-- name: CreateFornecedor :one
+INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING *;
+
+-- name: UpdateFornecedor :one
+UPDATE fornecedor
+SET name = $1,
+    telefone = $2,
+    email = $3,
+    adress = $4,
+    company_id = $5,
+    who_updated_id = $6,
+    cnpj = $7
+WHERE id = $8
+RETURNING *;
+
+-- name: DeleteFornecedorById :exec
+DELETE FROM fornecedor
 WHERE id = $1;

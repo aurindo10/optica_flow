@@ -12,6 +12,51 @@ import (
 	"github.com/google/uuid"
 )
 
+const createFornecedor = `-- name: CreateFornecedor :one
+INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj
+`
+
+type CreateFornecedorParams struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Telefone     string    `json:"telefone"`
+	Email        string    `json:"email"`
+	Adress       string    `json:"adress"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	Cnpj         string    `json:"cnpj"`
+}
+
+func (q *Queries) CreateFornecedor(ctx context.Context, arg CreateFornecedorParams) (Fornecedor, error) {
+	row := q.queryRow(ctx, q.createFornecedorStmt, createFornecedor,
+		arg.ID,
+		arg.Name,
+		arg.Telefone,
+		arg.Email,
+		arg.Adress,
+		arg.CompanyID,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
+		arg.Cnpj,
+	)
+	var i Fornecedor
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Telefone,
+		&i.Email,
+		&i.Adress,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.Cnpj,
+	)
+	return i, err
+}
+
 const createProduct = `-- name: CreateProduct :one
 WITH valid_fornecedor AS (
   SELECT id
@@ -71,6 +116,16 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	return i, err
 }
 
+const deleteFornecedorById = `-- name: DeleteFornecedorById :exec
+DELETE FROM fornecedor
+WHERE id = $1
+`
+
+func (q *Queries) DeleteFornecedorById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deleteFornecedorByIdStmt, deleteFornecedorById, id)
+	return err
+}
+
 const deleteProductById = `-- name: DeleteProductById :exec
 DELETE FROM product
 WHERE id = $1
@@ -79,6 +134,43 @@ WHERE id = $1
 func (q *Queries) DeleteProductById(ctx context.Context, id uuid.UUID) error {
 	_, err := q.exec(ctx, q.deleteProductByIdStmt, deleteProductById, id)
 	return err
+}
+
+const getAllFornecedores = `-- name: GetAllFornecedores :many
+SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor ORDER BY id ASC
+`
+
+func (q *Queries) GetAllFornecedores(ctx context.Context) ([]Fornecedor, error) {
+	rows, err := q.query(ctx, q.getAllFornecedoresStmt, getAllFornecedores)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Fornecedor
+	for rows.Next() {
+		var i Fornecedor
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Telefone,
+			&i.Email,
+			&i.Adress,
+			&i.CompanyID,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
+			&i.Cnpj,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getAllProducts = `-- name: GetAllProducts :many
@@ -120,6 +212,56 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateFornecedor = `-- name: UpdateFornecedor :one
+UPDATE fornecedor
+SET name = $1,
+    telefone = $2,
+    email = $3,
+    adress = $4,
+    company_id = $5,
+    who_updated_id = $6,
+    cnpj = $7
+WHERE id = $8
+RETURNING id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj
+`
+
+type UpdateFornecedorParams struct {
+	Name         string    `json:"name"`
+	Telefone     string    `json:"telefone"`
+	Email        string    `json:"email"`
+	Adress       string    `json:"adress"`
+	CompanyID    string    `json:"company_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	Cnpj         string    `json:"cnpj"`
+	ID           uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateFornecedor(ctx context.Context, arg UpdateFornecedorParams) (Fornecedor, error) {
+	row := q.queryRow(ctx, q.updateFornecedorStmt, updateFornecedor,
+		arg.Name,
+		arg.Telefone,
+		arg.Email,
+		arg.Adress,
+		arg.CompanyID,
+		arg.WhoUpdatedID,
+		arg.Cnpj,
+		arg.ID,
+	)
+	var i Fornecedor
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Telefone,
+		&i.Email,
+		&i.Adress,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.Cnpj,
+	)
+	return i, err
 }
 
 const updateProduct = `-- name: UpdateProduct :one
