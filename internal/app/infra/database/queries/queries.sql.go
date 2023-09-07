@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -265,74 +264,48 @@ func (q *Queries) UpdateFornecedor(ctx context.Context, arg UpdateFornecedorPara
 }
 
 const updateProduct = `-- name: UpdateProduct :one
-WITH valid_fornecedor AS (
-  SELECT id
-  FROM fornecedor
-  WHERE id = $1
-)
-UPDATE product
-SET name = $2,
-    price = $3,
-    fornecedor_id = $1,
-    description = $4,
-    brand = $5,
-    updated_at = current_timestamp,
-    bar_code = $6,
-    quantity = $7,
-    company_id = $8,
-    who_updated_id = $9
-FROM valid_fornecedor
-WHERE product.id = $10
-RETURNING valid_fornecedor.id, product.id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id
+UPDATE product 
+SET 
+  name = COALESCE($2, name),
+  price = COALESCE($3, price),
+  fornecedor_id = COALESCE($4, fornecedor_id),
+  description = COALESCE($5, description),
+  brand = COALESCE($6, brand),
+  updated_at = current_timestamp,
+  bar_code = COALESCE($7, bar_code),
+  quantity = COALESCE($8, quantity),
+  who_updated_id = COALESCE($9, who_updated_id)
+WHERE id = $1
+RETURNING id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id
 `
 
 type UpdateProductParams struct {
-	FornecedorID *string   `json:"fornecedor_id"`
-	Name         string    `json:"name"`
-	Price        float64   `json:"price"`
-	Description  string    `json:"description"`
-	Brand        string    `json:"brand"`
-	BarCode      string    `json:"bar_code"`
-	Quantity     int32     `json:"quantity"`
-	CompanyID    string    `json:"company_id"`
-	WhoUpdatedID string    `json:"who_updated_id"`
 	ID           uuid.UUID `json:"id"`
+	Name         *string   `json:"name"`
+	Price        *float64  `json:"price"`
+	FornecedorID *string   `json:"fornecedor_id"`
+	Description  *string   `json:"description"`
+	Brand        *string   `json:"brand"`
+	BarCode      *string   `json:"bar_code"`
+	Quantity     *int32    `json:"quantity"`
+	WhoUpdatedID *string   `json:"who_updated_id"`
 }
 
-type UpdateProductRow struct {
-	ID           uuid.UUID `json:"id"`
-	ID_2         uuid.UUID `json:"id_2"`
-	Name         string    `json:"name"`
-	Price        float64   `json:"price"`
-	FornecedorID *string   `json:"fornecedor_id"`
-	Description  string    `json:"description"`
-	Brand        string    `json:"brand"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	BarCode      string    `json:"bar_code"`
-	Quantity     int32     `json:"quantity"`
-	CompanyID    string    `json:"company_id"`
-	WhoCreatedID string    `json:"who_created_id"`
-	WhoUpdatedID string    `json:"who_updated_id"`
-}
-
-func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (UpdateProductRow, error) {
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
 	row := q.queryRow(ctx, q.updateProductStmt, updateProduct,
-		arg.FornecedorID,
+		arg.ID,
 		arg.Name,
 		arg.Price,
+		arg.FornecedorID,
 		arg.Description,
 		arg.Brand,
 		arg.BarCode,
 		arg.Quantity,
-		arg.CompanyID,
 		arg.WhoUpdatedID,
-		arg.ID,
 	)
-	var i UpdateProductRow
+	var i Product
 	err := row.Scan(
 		&i.ID,
-		&i.ID_2,
 		&i.Name,
 		&i.Price,
 		&i.FornecedorID,

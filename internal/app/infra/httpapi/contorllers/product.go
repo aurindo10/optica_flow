@@ -87,6 +87,11 @@ func (p *ProductController) UpdateProduct(c *fiber.Ctx) error{
 			fiber.Map{"error": error.Error()},
 		)
 	}
+	if info.ID == uuid.Nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{"error": "id is required"},
+		)
+	}
 	product, error := p.updateProduct.Execute(info)
 	if error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(

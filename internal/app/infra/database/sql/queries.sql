@@ -14,25 +14,21 @@ RETURNING *;
 
 
 -- name: UpdateProduct :one
-WITH valid_fornecedor AS (
-  SELECT id
-  FROM fornecedor
-  WHERE id = $1
-)
-UPDATE product
-SET name = $2,
-    price = $3,
-    fornecedor_id = $1,
-    description = $4,
-    brand = $5,
-    updated_at = current_timestamp,
-    bar_code = $6,
-    quantity = $7,
-    company_id = $8,
-    who_updated_id = $9
-FROM valid_fornecedor
-WHERE product.id = $10
-RETURNING *;
+UPDATE product 
+SET 
+  name = COALESCE(sqlc.narg('name'), name),
+  price = COALESCE(sqlc.narg('price'), price),
+  fornecedor_id = COALESCE(sqlc.narg('fornecedor_id'), fornecedor_id),
+  description = COALESCE(sqlc.narg('description'), description),
+  brand = COALESCE(sqlc.narg('brand'), brand),
+  updated_at = current_timestamp,
+  bar_code = COALESCE(sqlc.narg('bar_code'), bar_code),
+  quantity = COALESCE(sqlc.narg('quantity'), quantity),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id)
+WHERE id = $1
+RETURNING id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id;
+
+
 
 -- name: DeleteProductById :exec
 DELETE FROM product

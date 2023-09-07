@@ -51,10 +51,9 @@ func (p *ProductRepository) UpdateProduct(productRequest *product.ProductRequest
 		Brand: productRequest.Brand,
 		BarCode: productRequest.BarCode,
 		Quantity: productRequest.Quantity,
-		CompanyID: productRequest.CompanyID,
-		WhoUpdatedID: productRequest.WhoUpdatedID,
 		Description: productRequest.Description,
 		FornecedorID: productRequest.FornecedorID,
+		WhoUpdatedID: productRequest.WhoUpdatedID,
 	}
 	updatedProduct, error := p.db.UpdateProduct(ctx, info)
 	if error != nil {
