@@ -16,7 +16,7 @@ type ProductRouter struct {
 
 func (p *ProductRouter) Load(r *fiber.App) {
 	r.Post("/product",p.controller.CreateProduct)
-	r.Get("/products", p.controller.GetAllProducts)
+	r.Get("/products/company/:id", p.controller.GetAllProducts)
 	r.Put("/product", p.controller.UpdateProduct)
 	r.Delete("/product/:id", p.controller.DeleteProduct)
 }

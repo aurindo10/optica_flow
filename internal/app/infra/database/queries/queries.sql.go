@@ -174,11 +174,11 @@ func (q *Queries) GetAllFornecedores(ctx context.Context) ([]Fornecedor, error) 
 }
 
 const getAllProducts = `-- name: GetAllProducts :many
-SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product ORDER BY id ASC
+SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product WHERE company_id = $1 ORDER BY id ASC
 `
 
-func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
-	rows, err := q.query(ctx, q.getAllProductsStmt, getAllProducts)
+func (q *Queries) GetAllProducts(ctx context.Context, companyID string) ([]Product, error) {
+	rows, err := q.query(ctx, q.getAllProductsStmt, getAllProducts, companyID)
 	if err != nil {
 		return nil, err
 	}

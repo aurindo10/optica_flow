@@ -34,9 +34,9 @@ func (p *ProductRepository) CreateProduct(product *product.Product) error {
 	}
 	return nil
 }
-func (p *ProductRepository) GetAllProducts() ([]*product.Product, error) {
+func (p *ProductRepository) GetAllProducts(id string) ([]*product.Product, error) {
 	ctx := context.Background()
-	products, err := p.db.GetAllProducts(ctx)
+	products, err := p.db.GetAllProducts(ctx, id)
 	if err != nil {
 		return nil, err
 	}

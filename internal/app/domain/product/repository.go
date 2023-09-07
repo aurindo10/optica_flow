@@ -19,7 +19,7 @@ type ProductRequestToUpdate struct {
 
 type Repository interface {
 	CreateProduct(product *Product) error
-	GetAllProducts() ([]*Product, error)
+	GetAllProducts(id string) ([]*Product, error)
 	UpdateProduct(product *ProductRequestToUpdate) (*Product, error)
 	DeleteProduct(id uuid.UUID) error
 }

@@ -1,5 +1,5 @@
 -- name: GetAllProducts :many
-SELECT * FROM product ORDER BY id ASC;
+SELECT * FROM product WHERE company_id = $1 ORDER BY id ASC;
 
 -- name: CreateProduct :one
 WITH valid_fornecedor AS (

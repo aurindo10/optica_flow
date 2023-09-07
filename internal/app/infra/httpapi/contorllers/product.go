@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"optica_flow/internal/app/domain/product"
 	"time"
 
@@ -37,7 +36,6 @@ func (p *ProductController) CreateProduct(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).
 			JSON(fiber.Map{"error": "bad request"})
 	}
-	fmt.Printf("%+v\n", request)
 	if request.Name == "" || request.Price == 0 || request.FornecedorID == nil ||
 	 	request.Description == "" || request.Brand == "" || request.BarCode == "" ||
 		request.Quantity == 0 || request.CompanyID == "" || request.WhoCreatedID == "" || request.WhoUpdatedID =="" {
@@ -68,7 +66,13 @@ func (p *ProductController) CreateProduct(c *fiber.Ctx) error {
 }
 
 func (p *ProductController) GetAllProducts(c *fiber.Ctx) error {
-	products, error := p.getAllProducts.Execute()
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{"error": "id is required"},
+		)
+	}
+	products, error := p.getAllProducts.Execute(id)
 	if error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{"error": error.Error()},
