@@ -27,8 +27,8 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
 	}
-	if q.deletProductStmt, err = db.PrepareContext(ctx, deletProduct); err != nil {
-		return nil, fmt.Errorf("error preparing query DeletProduct: %w", err)
+	if q.deleteProductByIdStmt, err = db.PrepareContext(ctx, deleteProductById); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteProductById: %w", err)
 	}
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
@@ -46,9 +46,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
 		}
 	}
-	if q.deletProductStmt != nil {
-		if cerr := q.deletProductStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deletProductStmt: %w", cerr)
+	if q.deleteProductByIdStmt != nil {
+		if cerr := q.deleteProductByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteProductByIdStmt: %w", cerr)
 		}
 	}
 	if q.getAllProductsStmt != nil {
@@ -98,21 +98,21 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                 DBTX
-	tx                 *sql.Tx
-	createProductStmt  *sql.Stmt
-	deletProductStmt   *sql.Stmt
-	getAllProductsStmt *sql.Stmt
-	updateProductStmt  *sql.Stmt
+	db                    DBTX
+	tx                    *sql.Tx
+	createProductStmt     *sql.Stmt
+	deleteProductByIdStmt *sql.Stmt
+	getAllProductsStmt    *sql.Stmt
+	updateProductStmt     *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                 tx,
-		tx:                 tx,
-		createProductStmt:  q.createProductStmt,
-		deletProductStmt:   q.deletProductStmt,
-		getAllProductsStmt: q.getAllProductsStmt,
-		updateProductStmt:  q.updateProductStmt,
+		db:                    tx,
+		tx:                    tx,
+		createProductStmt:     q.createProductStmt,
+		deleteProductByIdStmt: q.deleteProductByIdStmt,
+		getAllProductsStmt:    q.getAllProductsStmt,
+		updateProductStmt:     q.updateProductStmt,
 	}
 }

@@ -21,7 +21,12 @@ func (p *ProductRepository) CreateProduct(product *product.Product) error {
 		Name:        product.Name,
 		Price:       product.Price,
 		Brand: 	 	product.Brand,
-		Fornecedor:  product.Fornecedor,
+		FornecedorID: product.FornecedorID,
+		BarCode:    product.BarCode,
+		Quantity:  product.Quantity,
+		CompanyID: product.CompanyID,
+		WhoCreatedID: product.WhoCreatedID,
+		WhoUpdatedID: product.WhoUpdatedID,
 		Description: product.Description,
 	}
 	if _, err := p.db.CreateProduct(ctx, info); err != nil {
@@ -43,9 +48,13 @@ func (p *ProductRepository) UpdateProduct(productRequest *product.ProductRequest
 		ID : productRequest.ID,
 		Name: productRequest.Name,
 		Price: productRequest.Price,
-		Fornecedor: productRequest.Fornecedor,
-		Description: productRequest.Fornecedor,
 		Brand: productRequest.Brand,
+		BarCode: productRequest.BarCode,
+		Quantity: productRequest.Quantity,
+		CompanyID: productRequest.CompanyID,
+		WhoUpdatedID: productRequest.WhoUpdatedID,
+		Description: productRequest.Description,
+		FornecedorID: productRequest.FornecedorID,
 	}
 	updatedProduct, error := p.db.UpdateProduct(ctx, info)
 	if error != nil {
@@ -55,11 +64,16 @@ func (p *ProductRepository) UpdateProduct(productRequest *product.ProductRequest
 		ID: updatedProduct.ID,
 		Name: updatedProduct.Name,
 		Price: updatedProduct.Price,
-		Fornecedor: updatedProduct.Fornecedor,
+		FornecedorID: updatedProduct.FornecedorID,
 		Description: updatedProduct.Description,
 		Brand: updatedProduct.Brand,
 		CreatedAt: updatedProduct.CreatedAt,
 		UpdatedAt: updatedProduct.UpdatedAt,
+		BarCode: updatedProduct.BarCode,
+		Quantity: updatedProduct.Quantity,
+		CompanyID: updatedProduct.CompanyID,
+		WhoCreatedID: updatedProduct.WhoCreatedID,
+		WhoUpdatedID: updatedProduct.WhoUpdatedID,
 	}
 	 return productUpdated, nil
 }
@@ -77,15 +91,22 @@ func (c *ProductRepository) mapResult(result *[]database.Product) []*product.Pro
 			Name:        v.Name,
 			Price:       v.Price,
 			Brand: 	 	v.Brand,
-			Fornecedor:  v.Fornecedor,
+			FornecedorID:  v.FornecedorID,
 			Description: v.Description,
+			CreatedAt:   v.CreatedAt,
+			UpdatedAt:   v.UpdatedAt,
+			BarCode:    v.BarCode,
+			Quantity:  v.Quantity,
+			CompanyID: v.CompanyID,
+			WhoCreatedID: v.WhoCreatedID,
+			WhoUpdatedID: v.WhoUpdatedID,
 		})
 	}
 	return products
 }
 
 func (c *ProductRepository) DeleteProduct(id uuid.UUID) error {
-	if error := c.db.DeletProduct(context.Background(), id); error != nil {
+	if error := c.db.DeleteProductById(context.Background(), id); error != nil {
 		return error
 	}
 	return nil

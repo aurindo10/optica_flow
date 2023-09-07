@@ -10,13 +10,141 @@ import (
 	"github.com/google/uuid"
 )
 
-type Product struct {
+type CashFlowBalance struct {
+	ID           uuid.UUID `json:"id"`
+	Date         time.Time `json:"date"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	ComissionID  *string   `json:"comission_id"`
+	DueDate      time.Time `json:"due_date"`
+	PaidDate     time.Time `json:"paid_date"`
+	Paid         bool      `json:"paid"`
+	Value        float64   `json:"value"`
+	Type         string    `json:"type"`
+	Description  string    `json:"description"`
+}
+
+type CashFlowEntries struct {
+	ID           uuid.UUID `json:"id"`
+	Date         time.Time `json:"date"`
+	Type         string    `json:"type"`
+	Amount       float64   `json:"amount"`
+	Description  string    `json:"description"`
+	CompanyID    string    `json:"company_id"`
+	OrderID      *string   `json:"order_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+}
+
+type Client struct {
+	ID           uuid.UUID `json:"id"`
+	FullName     string    `json:"full_name"`
+	Telefone     string    `json:"telefone"`
+	Cpf          *string   `json:"cpf"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Email        string    `json:"email"`
+	BirthDate    time.Time `json:"birth_date"`
+	Adress       *string   `json:"adress"`
+	Gender       *string   `json:"gender"`
+	City         *string   `json:"city"`
+	SellerID     *string   `json:"seller_id"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+}
+
+type ComissionValues struct {
+	ID           uuid.UUID `json:"id"`
+	Percentage   float64   `json:"percentage"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	Type         string    `json:"type"`
+}
+
+type Commission struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	CompanyID    uuid.UUID `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	OrderID      *string   `json:"order_id"`
+	Value        float64   `json:"value"`
+}
+
+type Fornecedor struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Telefone     string    `json:"telefone"`
+	Email        string    `json:"email"`
+	Adress       string    `json:"adress"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	Cnpj         string    `json:"cnpj"`
+}
+
+type Orders struct {
+	ID           uuid.UUID `json:"id"`
+	ProductName  string    `json:"product_name"`
+	Quantity     int32     `json:"quantity"`
+	OrderDate    time.Time `json:"order_date"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	ClientID     *string   `json:"client_id"`
+	CompanyID    string    `json:"company_id"`
+	Fase         string    `json:"fase"`
+}
+
+type Points struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
-	Price       float64   `json:"price"`
-	Fornecedor  string    `json:"fornecedor"`
 	Description string    `json:"description"`
-	Brand       string    `json:"brand"`
+	Active      bool      `json:"active"`
+	Ammount     float64   `json:"ammount"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	ValidDate   time.Time `json:"valid_date"`
+	CompanyID   string    `json:"company_id"`
+	OrderID     *string   `json:"order_id"`
+}
+
+type Product struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Price        float64   `json:"price"`
+	FornecedorID *string   `json:"fornecedor_id"`
+	Description  string    `json:"description"`
+	Brand        string    `json:"brand"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	BarCode      string    `json:"bar_code"`
+	Quantity     int32     `json:"quantity"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+}
+
+type ProductOrder struct {
+	ID        uuid.UUID `json:"id"`
+	Amout     int32     `json:"amout"`
+	ProductID *string   `json:"product_id"`
+	OrderID   *string   `json:"order_id"`
+}
+
+type TradeProduct struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	CompanyID    string    `json:"company_id"`
+	PointAmmount int32     `json:"point_ammount"`
+	ImageUrl     *string   `json:"image_url"`
+	WhoCreatedID string    `json:"who_created_id"`
 }

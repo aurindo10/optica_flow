@@ -13,57 +13,76 @@ import (
 )
 
 const createProduct = `-- name: CreateProduct :one
-INSERT INTO product (id, name, price, fornecedor, description, brand, created_at, updated_at)
- values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, name, price, fornecedor, description, brand, created_at, updated_at
+WITH valid_fornecedor AS (
+  SELECT id
+  FROM fornecedor
+  WHERE id = $1
+)
+INSERT INTO product (id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id)
+SELECT $2, $3, $4, $1, $5, $6, current_timestamp, current_timestamp, $7, $8, $9, $10, $11
+FROM valid_fornecedor
+RETURNING id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id
 `
 
 type CreateProductParams struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"name"`
-	Price       float64   `json:"price"`
-	Fornecedor  string    `json:"fornecedor"`
-	Description string    `json:"description"`
-	Brand       string    `json:"brand"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	FornecedorID *string   `json:"fornecedor_id"`
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Price        float64   `json:"price"`
+	Description  string    `json:"description"`
+	Brand        string    `json:"brand"`
+	BarCode      string    `json:"bar_code"`
+	Quantity     int32     `json:"quantity"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
 	row := q.queryRow(ctx, q.createProductStmt, createProduct,
+		arg.FornecedorID,
 		arg.ID,
 		arg.Name,
 		arg.Price,
-		arg.Fornecedor,
 		arg.Description,
 		arg.Brand,
-		arg.CreatedAt,
-		arg.UpdatedAt,
+		arg.BarCode,
+		arg.Quantity,
+		arg.CompanyID,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
 	)
 	var i Product
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Price,
-		&i.Fornecedor,
+		&i.FornecedorID,
 		&i.Description,
 		&i.Brand,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.BarCode,
+		&i.Quantity,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
 	)
 	return i, err
 }
 
-const deletProduct = `-- name: DeletProduct :exec
-DELETE FROM product WHERE id = $1
+const deleteProductById = `-- name: DeleteProductById :exec
+DELETE FROM product
+WHERE id = $1
 `
 
-func (q *Queries) DeletProduct(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deletProductStmt, deletProduct, id)
+func (q *Queries) DeleteProductById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deleteProductByIdStmt, deleteProductById, id)
 	return err
 }
 
 const getAllProducts = `-- name: GetAllProducts :many
-SELECT id, name, price, fornecedor, description, brand, created_at, updated_at FROM product ORDER BY id ASC
+SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product ORDER BY id ASC
 `
 
 func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
@@ -79,11 +98,16 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 			&i.ID,
 			&i.Name,
 			&i.Price,
-			&i.Fornecedor,
+			&i.FornecedorID,
 			&i.Description,
 			&i.Brand,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.BarCode,
+			&i.Quantity,
+			&i.CompanyID,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
 		); err != nil {
 			return nil, err
 		}
@@ -99,46 +123,86 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 }
 
 const updateProduct = `-- name: UpdateProduct :one
-UPDATE product 
-SET 
-name = coalesce($2, name),
-price = coalesce($3, price),
-fornecedor = coalesce($4, fornecedor),
-description = coalesce($5, description),
-brand = coalesce($6, brand),
-updated_at = now()
-WHERE id = $1
-RETURNING id, name, price, fornecedor, description, brand, created_at, updated_at
+WITH valid_fornecedor AS (
+  SELECT id
+  FROM fornecedor
+  WHERE id = $1
+)
+UPDATE product
+SET name = $2,
+    price = $3,
+    fornecedor_id = $1,
+    description = $4,
+    brand = $5,
+    updated_at = current_timestamp,
+    bar_code = $6,
+    quantity = $7,
+    company_id = $8,
+    who_updated_id = $9
+FROM valid_fornecedor
+WHERE product.id = $10
+RETURNING valid_fornecedor.id, product.id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id
 `
 
 type UpdateProductParams struct {
-	ID          uuid.UUID `json:"id"`
-	Name        *string   `json:"name"`
-	Price       *float64  `json:"price"`
-	Fornecedor  *string   `json:"fornecedor"`
-	Description *string   `json:"description"`
-	Brand       *string   `json:"brand"`
+	FornecedorID *string   `json:"fornecedor_id"`
+	Name         string    `json:"name"`
+	Price        float64   `json:"price"`
+	Description  string    `json:"description"`
+	Brand        string    `json:"brand"`
+	BarCode      string    `json:"bar_code"`
+	Quantity     int32     `json:"quantity"`
+	CompanyID    string    `json:"company_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	ID           uuid.UUID `json:"id"`
 }
 
-func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
+type UpdateProductRow struct {
+	ID           uuid.UUID `json:"id"`
+	ID_2         uuid.UUID `json:"id_2"`
+	Name         string    `json:"name"`
+	Price        float64   `json:"price"`
+	FornecedorID *string   `json:"fornecedor_id"`
+	Description  string    `json:"description"`
+	Brand        string    `json:"brand"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	BarCode      string    `json:"bar_code"`
+	Quantity     int32     `json:"quantity"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+}
+
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (UpdateProductRow, error) {
 	row := q.queryRow(ctx, q.updateProductStmt, updateProduct,
-		arg.ID,
+		arg.FornecedorID,
 		arg.Name,
 		arg.Price,
-		arg.Fornecedor,
 		arg.Description,
 		arg.Brand,
+		arg.BarCode,
+		arg.Quantity,
+		arg.CompanyID,
+		arg.WhoUpdatedID,
+		arg.ID,
 	)
-	var i Product
+	var i UpdateProductRow
 	err := row.Scan(
 		&i.ID,
+		&i.ID_2,
 		&i.Name,
 		&i.Price,
-		&i.Fornecedor,
+		&i.FornecedorID,
 		&i.Description,
 		&i.Brand,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.BarCode,
+		&i.Quantity,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
 	)
 	return i, err
 }

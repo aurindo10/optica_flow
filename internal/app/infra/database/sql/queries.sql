@@ -1,21 +1,38 @@
--- name: CreateProduct :one
-INSERT INTO product (id, name, price, fornecedor, description, brand, created_at, updated_at)
- values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
-
 -- name: GetAllProducts :many
 SELECT * FROM product ORDER BY id ASC;
 
--- name: UpdateProduct :one
-UPDATE product 
-SET 
-name = coalesce(sqlc.narg('name'), name),
-price = coalesce(sqlc.narg('price'), price),
-fornecedor = coalesce(sqlc.narg('fornecedor'), fornecedor),
-description = coalesce(sqlc.narg('description'), description),
-brand = coalesce(sqlc.narg('brand'), brand),
-updated_at = now()
-WHERE id = $1
+-- name: CreateProduct :one
+WITH valid_fornecedor AS (
+  SELECT id
+  FROM fornecedor
+  WHERE id = $1
+)
+INSERT INTO product (id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id)
+SELECT $2, $3, $4, $1, $5, $6, current_timestamp, current_timestamp, $7, $8, $9, $10, $11
+FROM valid_fornecedor
 RETURNING *;
 
--- name: DeletProduct :exec
-DELETE FROM product WHERE id = $1;
+
+-- name: UpdateProduct :one
+WITH valid_fornecedor AS (
+  SELECT id
+  FROM fornecedor
+  WHERE id = $1
+)
+UPDATE product
+SET name = $2,
+    price = $3,
+    fornecedor_id = $1,
+    description = $4,
+    brand = $5,
+    updated_at = current_timestamp,
+    bar_code = $6,
+    quantity = $7,
+    company_id = $8,
+    who_updated_id = $9
+FROM valid_fornecedor
+WHERE product.id = $10
+RETURNING *;
+-- name: DeleteProductById :exec
+DELETE FROM product
+WHERE id = $1;
