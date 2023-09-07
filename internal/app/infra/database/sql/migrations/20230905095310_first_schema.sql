@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS commission(
   description varchar(255) NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL,
-  company_id uuid NOT NULL,
+  company_id varchar(255) NOT NULL,
   who_created_id varchar(255) NOT NULL,
   who_updated_id varchar(255) NOT NULL,
   order_id uuid REFERENCES orders(id),

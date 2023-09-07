@@ -8,9 +8,11 @@ type Router interface {
 	Load()
 }
 func MakeRouter(
-	peopleRouter *ProductRouter,
+	ProductRouter *ProductRouter,
+	FornecedorRouter *FornecedorRouter,
 ) *fiber.App {
 	r := fiber.New()
-	peopleRouter.Load(r)
+	FornecedorRouter.Load(r)
+	ProductRouter.Load(r)
 	return r
 }

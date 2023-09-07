@@ -6,9 +6,20 @@ type CreateFornecedor struct {
 }
 
 func (c *CreateFornecedor) Execute(request *Fornecedor) (*Fornecedor, error) {
-	info := NewFornecedor(request)
-	fornecedor, err := c.repository.CreateFornecedor(info)
-	if err != nil {
+	p := NewFornecedor(request)
+	result := &Fornecedor{
+		ID: 		 p.ID,
+		Name: 		 p.Name,
+		Telefone: 	 p.Telefone,
+		Email: 		 p.Email,
+		Adress: 	 p.Adress,
+		CompanyID: 	 p.CompanyID,
+		WhoCreatedID: p.WhoCreatedID,
+		WhoUpdatedID: p.WhoUpdatedID,
+		Cnpj: 		 p.Cnpj,
+	}
+	fornecedor, err := c.repository.CreateFornecedor(result)
+	if err != nil { 
 		return nil, err
 	}
 	return fornecedor, nil

@@ -70,7 +70,7 @@ type Commission struct {
 	Description  string    `json:"description"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
-	CompanyID    uuid.UUID `json:"company_id"`
+	CompanyID    string    `json:"company_id"`
 	WhoCreatedID string    `json:"who_created_id"`
 	WhoUpdatedID string    `json:"who_updated_id"`
 	OrderID      *string   `json:"order_id"`
