@@ -11,6 +11,7 @@ type FornecedorRouter struct {
 }
 func (c *FornecedorRouter) Load(r *fiber.App) {
 	r.Post("/fornecedor", c.controller.CreateFornecedor)
+	r.Get("/fornecedor/:id", c.controller.GetFornecedorByID)
 }
 func NewFornecedorRouter(controller *controllers.FornecedorController) *FornecedorRouter{
 	return &FornecedorRouter{

@@ -213,6 +213,27 @@ func (q *Queries) GetAllProducts(ctx context.Context, companyID string) ([]Produ
 	return items, nil
 }
 
+const getFornecedorByID = `-- name: GetFornecedorByID :one
+SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetFornecedorByID(ctx context.Context, id uuid.UUID) (Fornecedor, error) {
+	row := q.queryRow(ctx, q.getFornecedorByIDStmt, getFornecedorByID, id)
+	var i Fornecedor
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Telefone,
+		&i.Email,
+		&i.Adress,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.Cnpj,
+	)
+	return i, err
+}
+
 const getProductByID = `-- name: GetProductByID :one
 SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product WHERE id = $1 LIMIT 1
 `

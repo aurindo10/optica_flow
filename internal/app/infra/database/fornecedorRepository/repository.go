@@ -2,8 +2,11 @@ package fornecedorrepository
 
 import (
 	"context"
+	"fmt"
 	"optica_flow/internal/app/domain/fornecedor"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 
@@ -38,6 +41,25 @@ func (f *FornecedorRepository) CreateFornecedor(params *fornecedor.Fornecedor) (
 		WhoCreatedID: result.WhoCreatedID,
 		WhoUpdatedID: result.WhoUpdatedID,
 		Cnpj: result.Cnpj,
+	}
+	return response, nil
+}
+func (c * FornecedorRepository) GetFornecedorById(id uuid.UUID) (*fornecedor.Fornecedor, error) {
+	fmt.Printf("GetFornecedorById: %v\n", id)
+	p, error := c.db.GetFornecedorByID(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	response := &fornecedor.Fornecedor{
+		ID: p.ID,
+		Name: p.Name,
+		Email: p.Email,
+		Telefone: p.Telefone,
+		Adress: p.Adress,
+		CompanyID: p.CompanyID,
+		WhoCreatedID: p.WhoCreatedID,
+		WhoUpdatedID: p.WhoUpdatedID,
+		Cnpj: p.Cnpj,
 	}
 	return response, nil
 }

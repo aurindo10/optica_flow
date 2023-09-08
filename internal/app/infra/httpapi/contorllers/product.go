@@ -118,7 +118,7 @@ func NewProductController(createProduct *product.CreateProduct,
 
 func (p * ProductController) GetProductById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	if id == "" {
+	if id == uuid.Nil.String() {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			fiber.Map{"error": "id is required"},
 		)
