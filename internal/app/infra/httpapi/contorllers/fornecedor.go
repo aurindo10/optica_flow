@@ -12,6 +12,7 @@ type FornecedorController struct {
 	createFornecedor *fornecedor.CreateFornecedor
 	getFornecedorById *fornecedor.GetFornecedorById
 	findAllFornecedores *fornecedor.Find
+	update *fornecedor.Update
 }
 
 
@@ -66,10 +67,29 @@ func (p *FornecedorController) FindAllFornecedoresByCompanyId(c *fiber.Ctx) erro
 	return  c.Status(fiber.StatusOK).JSON(response)
 }
 
-func NewFornecedorController(createFornecedor *fornecedor.CreateFornecedor, getFornecedorById *fornecedor.GetFornecedorById, findAllFornecedores *fornecedor.Find) *FornecedorController{
+func (p *FornecedorController) UpdateFornecedor (c *fiber.Ctx) error {
+	var body fornecedor.FornecedorToUpdate
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": "bad request"})
+	}
+	if body.ID == uuid.Nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": "some fields are required"})
+	}
+	response, error := p.update.Execute(&body)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	return  c.Status(fiber.StatusOK).JSON(response)
+}
+
+func NewFornecedorController(createFornecedor *fornecedor.CreateFornecedor, getFornecedorById *fornecedor.GetFornecedorById, findAllFornecedores *fornecedor.Find, update *fornecedor.Update) *FornecedorController{
 	return &FornecedorController{
 		createFornecedor: createFornecedor,
 		getFornecedorById: getFornecedorById,
 		findAllFornecedores: findAllFornecedores,
+		update: update,
 	}
 }

@@ -42,18 +42,6 @@ INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_creat
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 
--- name: UpdateFornecedor :one
-UPDATE fornecedor
-SET name = $1,
-    telefone = $2,
-    email = $3,
-    adress = $4,
-    company_id = $5,
-    who_updated_id = $6,
-    cnpj = $7
-WHERE id = $8
-RETURNING *;
-
 -- name: DeleteFornecedorById :exec
 DELETE FROM fornecedor
 WHERE id = $1;
@@ -63,3 +51,16 @@ SELECT * FROM product WHERE id = $1 LIMIT 1;
 
 -- name: GetFornecedorByID :one
 SELECT * FROM fornecedor WHERE id = $1 LIMIT 1;
+
+-- name: UpdateFornecedor :one
+UPDATE fornecedor 
+SET 
+  name = COALESCE(sqlc.narg('name'), name),
+  telefone = COALESCE(sqlc.narg('telefone'), telefone),
+  email = COALESCE(sqlc.narg('email'), email),
+  adress = COALESCE(sqlc.narg('adress'), adress),
+  company_id = COALESCE(sqlc.narg('company_id'), company_id),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id),
+  cnpj = COALESCE(sqlc.narg('cnpj'), cnpj)
+WHERE id = $1
+RETURNING id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj;

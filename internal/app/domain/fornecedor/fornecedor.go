@@ -39,3 +39,12 @@ import (
 		Cnpj:         request.Cnpj,
 	}
 }
+
+type FornecedorToUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	Name         *string    `json:"name"`
+	Telefone     *string    `json:"telefone"`
+	Email        *string    `json:"email"`
+	Adress       *string    `json:"adress"`
+	Cnpj         *string    `json:"cnpj"`
+}

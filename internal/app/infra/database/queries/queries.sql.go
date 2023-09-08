@@ -260,31 +260,33 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, er
 }
 
 const updateFornecedor = `-- name: UpdateFornecedor :one
-UPDATE fornecedor
-SET name = $1,
-    telefone = $2,
-    email = $3,
-    adress = $4,
-    company_id = $5,
-    who_updated_id = $6,
-    cnpj = $7
-WHERE id = $8
+UPDATE fornecedor 
+SET 
+  name = COALESCE($2, name),
+  telefone = COALESCE($3, telefone),
+  email = COALESCE($4, email),
+  adress = COALESCE($5, adress),
+  company_id = COALESCE($6, company_id),
+  who_updated_id = COALESCE($7, who_updated_id),
+  cnpj = COALESCE($8, cnpj)
+WHERE id = $1
 RETURNING id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj
 `
 
 type UpdateFornecedorParams struct {
-	Name         string    `json:"name"`
-	Telefone     string    `json:"telefone"`
-	Email        string    `json:"email"`
-	Adress       string    `json:"adress"`
-	CompanyID    string    `json:"company_id"`
-	WhoUpdatedID string    `json:"who_updated_id"`
-	Cnpj         string    `json:"cnpj"`
 	ID           uuid.UUID `json:"id"`
+	Name         *string   `json:"name"`
+	Telefone     *string   `json:"telefone"`
+	Email        *string   `json:"email"`
+	Adress       *string   `json:"adress"`
+	CompanyID    *string   `json:"company_id"`
+	WhoUpdatedID *string   `json:"who_updated_id"`
+	Cnpj         *string   `json:"cnpj"`
 }
 
 func (q *Queries) UpdateFornecedor(ctx context.Context, arg UpdateFornecedorParams) (Fornecedor, error) {
 	row := q.queryRow(ctx, q.updateFornecedorStmt, updateFornecedor,
+		arg.ID,
 		arg.Name,
 		arg.Telefone,
 		arg.Email,
@@ -292,7 +294,6 @@ func (q *Queries) UpdateFornecedor(ctx context.Context, arg UpdateFornecedorPara
 		arg.CompanyID,
 		arg.WhoUpdatedID,
 		arg.Cnpj,
-		arg.ID,
 	)
 	var i Fornecedor
 	err := row.Scan(

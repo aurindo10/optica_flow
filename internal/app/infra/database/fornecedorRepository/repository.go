@@ -93,3 +93,30 @@ func (c *FornecedorRepository) mapResult(result *[]database.Fornecedor) []*forne
 	}
 	return fornecedores
 }
+
+func (c *FornecedorRepository) Update(params *fornecedor.FornecedorToUpdate) (*fornecedor.Fornecedor, error){
+	p := database.UpdateFornecedorParams{
+		ID: params.ID,
+		Name: params.Name,
+		Email: params.Email,
+		Telefone: params.Telefone,
+		Adress: params.Adress,
+		Cnpj: params.Cnpj,
+	}
+	result, error := c.db.UpdateFornecedor(context.Background(), p)
+	if error != nil {
+		return nil, error
+	}
+	response := &fornecedor.Fornecedor{
+		ID: result.ID,
+		Name: result.Name,
+		Email: result.Email,
+		Telefone: result.Telefone,
+		Adress: result.Adress,
+		CompanyID: result.CompanyID,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+		Cnpj: result.Cnpj,
+	}
+	return response, nil
+}
