@@ -213,6 +213,31 @@ func (q *Queries) GetAllProducts(ctx context.Context, companyID string) ([]Produ
 	return items, nil
 }
 
+const getProductByID = `-- name: GetProductByID :one
+SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, error) {
+	row := q.queryRow(ctx, q.getProductByIDStmt, getProductByID, id)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Price,
+		&i.FornecedorID,
+		&i.Description,
+		&i.Brand,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.BarCode,
+		&i.Quantity,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+	)
+	return i, err
+}
+
 const updateFornecedor = `-- name: UpdateFornecedor :one
 UPDATE fornecedor
 SET name = $1,

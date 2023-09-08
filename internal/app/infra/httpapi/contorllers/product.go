@@ -13,6 +13,7 @@ type ProductController struct {
 	getAllProducts *product.GetAllProducts
 	updateProduct *product.UpdateProduct
 	deleteProduct *product.DeleteProduct
+	getOneProduct *product.GetProduct
 }
 type CreateProductRequest struct {
 	ID           uuid.UUID `json:"id"`
@@ -111,8 +112,28 @@ func (p * ProductController) DeleteProduct(c *fiber.Ctx) error {
 	return nil
 }
 func NewProductController(createProduct *product.CreateProduct,
-	 getAllProducts *product.GetAllProducts, updateProduct *product.UpdateProduct, deleteProduct *product.DeleteProduct) *ProductController {
-	return &ProductController{createProduct, getAllProducts, updateProduct, deleteProduct}
+	 getAllProducts *product.GetAllProducts, updateProduct *product.UpdateProduct, deleteProduct *product.DeleteProduct, getOneProduct *product.GetProduct) *ProductController {
+	return &ProductController{createProduct, getAllProducts, updateProduct, deleteProduct, getOneProduct}
 }
 
-
+func (p * ProductController) GetProductById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{"error": "id is required"},
+		)
+	}
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{"error": "id is invalid"},
+		)
+	}
+	product, error := p.getOneProduct.Execute(idParsed)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			fiber.Map{"error": error.Error()},
+		)
+	}
+	return c.Status(fiber.StatusOK).JSON(product)
+}

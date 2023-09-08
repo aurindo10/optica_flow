@@ -42,6 +42,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
 	}
+	if q.getProductByIDStmt, err = db.PrepareContext(ctx, getProductByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetProductByID: %w", err)
+	}
 	if q.updateFornecedorStmt, err = db.PrepareContext(ctx, updateFornecedor); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateFornecedor: %w", err)
 	}
@@ -81,6 +84,11 @@ func (q *Queries) Close() error {
 	if q.getAllProductsStmt != nil {
 		if cerr := q.getAllProductsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAllProductsStmt: %w", cerr)
+		}
+	}
+	if q.getProductByIDStmt != nil {
+		if cerr := q.getProductByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getProductByIDStmt: %w", cerr)
 		}
 	}
 	if q.updateFornecedorStmt != nil {
@@ -138,6 +146,7 @@ type Queries struct {
 	deleteProductByIdStmt    *sql.Stmt
 	getAllFornecedoresStmt   *sql.Stmt
 	getAllProductsStmt       *sql.Stmt
+	getProductByIDStmt       *sql.Stmt
 	updateFornecedorStmt     *sql.Stmt
 	updateProductStmt        *sql.Stmt
 }
@@ -152,6 +161,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteProductByIdStmt:    q.deleteProductByIdStmt,
 		getAllFornecedoresStmt:   q.getAllFornecedoresStmt,
 		getAllProductsStmt:       q.getAllProductsStmt,
+		getProductByIDStmt:       q.getProductByIDStmt,
 		updateFornecedorStmt:     q.updateFornecedorStmt,
 		updateProductStmt:        q.updateProductStmt,
 	}

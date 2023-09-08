@@ -57,3 +57,6 @@ RETURNING *;
 -- name: DeleteFornecedorById :exec
 DELETE FROM fornecedor
 WHERE id = $1;
+
+-- name: GetProductByID :one
+SELECT * FROM product WHERE id = $1 LIMIT 1;

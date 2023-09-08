@@ -21,5 +21,6 @@ type Repository interface {
 	GetAllProducts(id string) ([]*Product, error)
 	UpdateProduct(product *ProductRequestToUpdate) (*Product, error)
 	DeleteProduct(id uuid.UUID) error
+	GetProductById(id uuid.UUID) (*Product, error)
 }
 

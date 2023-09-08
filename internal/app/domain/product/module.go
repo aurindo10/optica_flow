@@ -8,4 +8,5 @@ var Module = fx.Provide(
 	NewGetAllProducts,
 	NewUpdateProduct,
 	NewDeleteProduct,
+	NewGetProduct,
 )

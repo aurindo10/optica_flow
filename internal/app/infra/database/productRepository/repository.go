@@ -110,3 +110,26 @@ func (c *ProductRepository) DeleteProduct(id uuid.UUID) error {
 	}
 	return nil
 }
+
+func (c *ProductRepository) GetProductById(id uuid.UUID) (*product.Product, error) {
+	p, error := c.db.GetProductByID(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	response := &product.Product{
+		ID:          p.ID,
+		Name:        p.Name,
+		Price:       p.Price,
+		Brand: 	 	p.Brand,
+		FornecedorID:  p.FornecedorID,
+		Description: p.Description,
+		CreatedAt:   p.CreatedAt,
+		UpdatedAt:   p.UpdatedAt,
+		BarCode:    p.BarCode,
+		Quantity:  p.Quantity,
+		CompanyID: p.CompanyID,
+		WhoCreatedID: p.WhoCreatedID,
+		WhoUpdatedID: p.WhoUpdatedID,
+	}
+	return response, nil
+}
