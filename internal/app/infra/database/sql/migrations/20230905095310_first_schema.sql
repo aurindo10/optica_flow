@@ -2,7 +2,7 @@
 
 -- +goose Up
 CREATE TABLE IF NOT EXISTS fornecedor (
-  id uuid PRIMARY KEY,
+  id uuid,
   name varchar(255) NOT NULL,
   telefone varchar(255) NOT NULL,
   email varchar(255) NOT NULL,
@@ -10,15 +10,16 @@ CREATE TABLE IF NOT EXISTS fornecedor (
   company_id varchar(255) NOT NULL,
   who_created_id varchar(255) NOT NULL,
   who_updated_id varchar(255) NOT NULL,
-  cnpj varchar(255) NOT NULL
+  cnpj varchar(255) NOT NULL,
+   PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS product(
   id uuid PRIMARY KEY,
   name varchar(255) NOT NULL,
   price float NOT NULL,
-  fornecedor_id uuid REFERENCES fornecedor(id),
-  CONSTRAINT fk_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor(id) ON DELETE CASCADE,
+  fornecedor_id uuid REFERENCES fornecedor(id) ON DELETE SET NULL,
+  CONSTRAINT fk_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor(id),
   description varchar(255) NOT NULL,
   brand varchar(255) NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
@@ -54,8 +55,8 @@ CREATE TABLE IF NOT EXISTS orders (
   order_date timestamp NOT NULL DEFAULT current_timestamp,
   who_created_id varchar(255) NOT NULL,
   who_updated_id varchar(255) NOT NULL,
-  client_id uuid REFERENCES client(id),
-  CONSTRAINT fk_client FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE,
+  client_id uuid REFERENCES client(id) ON DELETE CASCADE,
+  CONSTRAINT fk_client FOREIGN KEY (client_id) REFERENCES client(id),
   company_id varchar(255) NOT NULL,
   fase varchar(255) NOT NULL
     
@@ -64,10 +65,10 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS product_order (
   id uuid PRIMARY KEY,
   amout int NOT NULL,
-  product_id uuid REFERENCES product(id),
-  order_id uuid REFERENCES orders(id),
-  CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE,
-  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+  product_id uuid REFERENCES product(id) ON DELETE CASCADE,
+  order_id uuid REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES product(id),
+  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id) 
 );
 
 CREATE TABLE IF NOT EXISTS points(
@@ -80,8 +81,8 @@ CREATE TABLE IF NOT EXISTS points(
   updated_at timestamp NOT NULL,
   valid_date timestamp NOT NULL,
   company_id varchar(255) NOT NULL,
-  order_id uuid REFERENCES orders(id),
-  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+  order_id uuid REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
 CREATE TABLE IF NOT EXISTS trade_product(
@@ -106,8 +107,8 @@ CREATE TABLE IF NOT EXISTS commission(
   company_id varchar(255) NOT NULL,
   who_created_id varchar(255) NOT NULL,
   who_updated_id varchar(255) NOT NULL,
-  order_id uuid REFERENCES orders(id),
-  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  order_id uuid REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id),
   value float NOT NULL
 );
 
@@ -129,8 +130,8 @@ CREATE TABLE IF NOT EXISTS cash_flow_entries (
   amount float NOT NULL,
   description varchar(255) NOT NULL,
   company_id varchar(255) NOT NULL,
-  order_id uuid REFERENCES orders(id), -- para relacionar uma entrada de receita a um pedido
-  CONSTRAINT fk_order_entries FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  order_id uuid REFERENCES orders(id) ON DELETE CASCADE, -- para relacionar uma entrada de receita a um pedido
+  CONSTRAINT fk_order_entries FOREIGN KEY (order_id) REFERENCES orders(id),
   who_created_id varchar(255) NOT NULL,
   who_updated_id varchar(255) NOT NULL
 
@@ -143,12 +144,19 @@ CREATE TABLE IF NOT EXISTS cash_flow_balance (
   company_id varchar(255) NOT NULL,
   who_created_id varchar(255) NOT NULL,
   who_updated_id varchar(255) NOT NULL,
-  comission_id uuid REFERENCES commission(id),
-  CONSTRAINT fk_comission FOREIGN KEY (comission_id) REFERENCES commission(id) ON DELETE CASCADE,
+  comission_id uuid REFERENCES commission(id) ON DELETE CASCADE,
+  CONSTRAINT fk_comission FOREIGN KEY (comission_id) REFERENCES commission(id),
   due_date timestamp NOT NULL,
   paid_date timestamp NOT NULL,
   paid boolean NOT NULL,
   value float NOT NULL,
   type varchar(255) NOT NULL,
   description varchar(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS goose_db_version (
+  id serial primary key,
+  version_id bigint,
+  is_applied boolean,
+  tstamp timestamp
 );

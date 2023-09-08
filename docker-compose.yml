@@ -1,10 +1,10 @@
 version: "3"
 services:
   otica:
-    image: bitnami/postgresql
+    image: postgres:latest
     ports:
       - 5432:5432
     environment:
-      - POSTGRESQL_USERNAME=docker
-      - POSTGRESQL_DATABASE=otica
-      - POSTGRESQL_PASSWORD=otica123
+      - POSTGRES_USER=docker
+      - POSTGRES_DB=otica
+      - POSTGRES_PASSWORD=otica123
