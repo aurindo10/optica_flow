@@ -7,9 +7,69 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const createClient = `-- name: CreateClient :one
+INSERT INTO client (id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id)
+VALUES ($1, $2, $3, $4, current_timestamp, current_timestamp, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+RETURNING id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id
+`
+
+type CreateClientParams struct {
+	ID           uuid.UUID `json:"id"`
+	FullName     string    `json:"full_name"`
+	Telefone     string    `json:"telefone"`
+	Cpf          *string   `json:"cpf"`
+	Email        string    `json:"email"`
+	BirthDate    time.Time `json:"birth_date"`
+	Adress       *string   `json:"adress"`
+	Gender       *string   `json:"gender"`
+	City         *string   `json:"city"`
+	SellerID     *string   `json:"seller_id"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+}
+
+func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Client, error) {
+	row := q.queryRow(ctx, q.createClientStmt, createClient,
+		arg.ID,
+		arg.FullName,
+		arg.Telefone,
+		arg.Cpf,
+		arg.Email,
+		arg.BirthDate,
+		arg.Adress,
+		arg.Gender,
+		arg.City,
+		arg.SellerID,
+		arg.CompanyID,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
+	)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.Telefone,
+		&i.Cpf,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.BirthDate,
+		&i.Adress,
+		&i.Gender,
+		&i.City,
+		&i.SellerID,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+	)
+	return i, err
+}
 
 const createFornecedor = `-- name: CreateFornecedor :one
 INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)

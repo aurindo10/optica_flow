@@ -5,6 +5,7 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -87,6 +88,13 @@ type Fornecedor struct {
 	WhoCreatedID string    `json:"who_created_id"`
 	WhoUpdatedID string    `json:"who_updated_id"`
 	Cnpj         string    `json:"cnpj"`
+}
+
+type GooseDbVersion struct {
+	ID        int32         `json:"id"`
+	VersionID sql.NullInt64 `json:"version_id"`
+	IsApplied sql.NullBool  `json:"is_applied"`
+	Tstamp    *time.Time    `json:"tstamp"`
 }
 
 type Orders struct {
