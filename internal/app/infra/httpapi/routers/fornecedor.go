@@ -14,6 +14,7 @@ func (c *FornecedorRouter) Load(r *fiber.App) {
 	r.Get("/fornecedor/:id", c.controller.GetFornecedorByID)
 	r.Get("/fornecedor/company/:id", c.controller.FindAllFornecedoresByCompanyId)
 	r.Put("/fornecedor/", c.controller.UpdateFornecedor)
+	r.Delete("/fornecedor/:id", c.controller.Delete)
 }
 func NewFornecedorRouter(controller *controllers.FornecedorController) *FornecedorRouter{
 	return &FornecedorRouter{

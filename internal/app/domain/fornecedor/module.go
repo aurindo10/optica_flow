@@ -8,4 +8,5 @@ var Module = fx.Provide(
 	NewGetFornecedorById,
 	NewFind,
 	NewFornecedorUpdate,
+	NewDeleleteFornecedor,
 )

@@ -13,6 +13,7 @@ type FornecedorController struct {
 	getFornecedorById *fornecedor.GetFornecedorById
 	findAllFornecedores *fornecedor.Find
 	update *fornecedor.Update
+	delete *fornecedor.Delete
 }
 
 
@@ -84,12 +85,30 @@ func (p *FornecedorController) UpdateFornecedor (c *fiber.Ctx) error {
 	}
 	return  c.Status(fiber.StatusOK).JSON(response)
 }
-
-func NewFornecedorController(createFornecedor *fornecedor.CreateFornecedor, getFornecedorById *fornecedor.GetFornecedorById, findAllFornecedores *fornecedor.Find, update *fornecedor.Update) *FornecedorController{
+func (p *FornecedorController) Delete(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == uuid.Nil.String() {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": "some fields are required"})
+	}
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	error = p.delete.Execute(idParsed)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	return  c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "deleted"})
+}
+func NewFornecedorController(createFornecedor *fornecedor.CreateFornecedor, getFornecedorById *fornecedor.GetFornecedorById, findAllFornecedores *fornecedor.Find, update *fornecedor.Update, delete *fornecedor.Delete) *FornecedorController{
 	return &FornecedorController{
 		createFornecedor: createFornecedor,
 		getFornecedorById: getFornecedorById,
 		findAllFornecedores: findAllFornecedores,
 		update: update,
+		delete: delete,
 	}
 }

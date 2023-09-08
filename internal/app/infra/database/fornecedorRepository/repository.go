@@ -120,3 +120,10 @@ func (c *FornecedorRepository) Update(params *fornecedor.FornecedorToUpdate) (*f
 	}
 	return response, nil
 }
+func (c *FornecedorRepository) Delete(id uuid.UUID) error {
+	error := c.db.DeleteFornecedorById(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
+}
