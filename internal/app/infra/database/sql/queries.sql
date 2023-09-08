@@ -34,8 +34,8 @@ RETURNING id, name, price, fornecedor_id, description, brand, created_at, update
 DELETE FROM product
 WHERE id = $1;
 
--- name: GetAllFornecedores :many
-SELECT * FROM fornecedor ORDER BY id ASC;
+-- name: FindAllFornecedores :many
+SELECT * FROM fornecedor WHERE company_id = $1 ORDER BY id ASC;
 
 -- name: CreateFornecedor :one
 INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)

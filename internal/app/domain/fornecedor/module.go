@@ -6,4 +6,5 @@ var Module = fx.Provide(
 	NewFornecedor,
 	NewCreateFornecedor,
 	NewGetFornecedorById,
+	NewFind,
 )

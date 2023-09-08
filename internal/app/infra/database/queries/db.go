@@ -36,8 +36,8 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteProductByIdStmt, err = db.PrepareContext(ctx, deleteProductById); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteProductById: %w", err)
 	}
-	if q.getAllFornecedoresStmt, err = db.PrepareContext(ctx, getAllFornecedores); err != nil {
-		return nil, fmt.Errorf("error preparing query GetAllFornecedores: %w", err)
+	if q.findAllFornecedoresStmt, err = db.PrepareContext(ctx, findAllFornecedores); err != nil {
+		return nil, fmt.Errorf("error preparing query FindAllFornecedores: %w", err)
 	}
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
@@ -79,9 +79,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteProductByIdStmt: %w", cerr)
 		}
 	}
-	if q.getAllFornecedoresStmt != nil {
-		if cerr := q.getAllFornecedoresStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getAllFornecedoresStmt: %w", cerr)
+	if q.findAllFornecedoresStmt != nil {
+		if cerr := q.findAllFornecedoresStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findAllFornecedoresStmt: %w", cerr)
 		}
 	}
 	if q.getAllProductsStmt != nil {
@@ -152,7 +152,7 @@ type Queries struct {
 	createProductStmt        *sql.Stmt
 	deleteFornecedorByIdStmt *sql.Stmt
 	deleteProductByIdStmt    *sql.Stmt
-	getAllFornecedoresStmt   *sql.Stmt
+	findAllFornecedoresStmt  *sql.Stmt
 	getAllProductsStmt       *sql.Stmt
 	getFornecedorByIDStmt    *sql.Stmt
 	getProductByIDStmt       *sql.Stmt
@@ -168,7 +168,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createProductStmt:        q.createProductStmt,
 		deleteFornecedorByIdStmt: q.deleteFornecedorByIdStmt,
 		deleteProductByIdStmt:    q.deleteProductByIdStmt,
-		getAllFornecedoresStmt:   q.getAllFornecedoresStmt,
+		findAllFornecedoresStmt:  q.findAllFornecedoresStmt,
 		getAllProductsStmt:       q.getAllProductsStmt,
 		getFornecedorByIDStmt:    q.getFornecedorByIDStmt,
 		getProductByIDStmt:       q.getProductByIDStmt,

@@ -63,8 +63,33 @@ func (c * FornecedorRepository) GetFornecedorById(id uuid.UUID) (*fornecedor.For
 	}
 	return response, nil
 }
+func (c * FornecedorRepository) FindAllFornecedoresByCompanyId(id string) ([]*fornecedor.Fornecedor, error) {
+	r, error := c.db.FindAllFornecedores(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	result := c.mapResult(&r)
+	return result, nil 
+}
 func NewFornecedorRepository(db *database.Queries) *FornecedorRepository {
 	return &FornecedorRepository{
 		db: db,
 	}
+}
+func (c *FornecedorRepository) mapResult(result *[]database.Fornecedor) []*fornecedor.Fornecedor {
+	var fornecedores []*fornecedor.Fornecedor
+	for _, v := range *result {
+		fornecedores = append(fornecedores, &fornecedor.Fornecedor{
+			ID: v.ID,
+			Name: v.Name,
+			Email: v.Email,
+			Telefone: v.Telefone,
+			Adress: v.Adress,
+			CompanyID: v.CompanyID,
+			WhoCreatedID: v.WhoCreatedID,
+			WhoUpdatedID: v.WhoUpdatedID,
+			Cnpj: v.Cnpj,
+		})
+	}
+	return fornecedores
 }

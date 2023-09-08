@@ -11,6 +11,7 @@ import (
 type FornecedorController struct {
 	createFornecedor *fornecedor.CreateFornecedor
 	getFornecedorById *fornecedor.GetFornecedorById
+	findAllFornecedores *fornecedor.Find
 }
 
 
@@ -51,9 +52,24 @@ func (p *FornecedorController) GetFornecedorByID(c *fiber.Ctx) error {
 	return  c.Status(fiber.StatusOK).JSON(response)
 }
 
-func NewFornecedorController(createFornecedor *fornecedor.CreateFornecedor, getFornecedorById *fornecedor.GetFornecedorById) *FornecedorController{
+func (p *FornecedorController) FindAllFornecedoresByCompanyId(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": "some fields are required"})
+	}
+	response, error := p.findAllFornecedores.Execute(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	return  c.Status(fiber.StatusOK).JSON(response)
+}
+
+func NewFornecedorController(createFornecedor *fornecedor.CreateFornecedor, getFornecedorById *fornecedor.GetFornecedorById, findAllFornecedores *fornecedor.Find) *FornecedorController{
 	return &FornecedorController{
 		createFornecedor: createFornecedor,
 		getFornecedorById: getFornecedorById,
+		findAllFornecedores: findAllFornecedores,
 	}
 }

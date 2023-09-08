@@ -135,12 +135,12 @@ func (q *Queries) DeleteProductById(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getAllFornecedores = `-- name: GetAllFornecedores :many
-SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor ORDER BY id ASC
+const findAllFornecedores = `-- name: FindAllFornecedores :many
+SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor WHERE company_id = $1 ORDER BY id ASC
 `
 
-func (q *Queries) GetAllFornecedores(ctx context.Context) ([]Fornecedor, error) {
-	rows, err := q.query(ctx, q.getAllFornecedoresStmt, getAllFornecedores)
+func (q *Queries) FindAllFornecedores(ctx context.Context, companyID string) ([]Fornecedor, error) {
+	rows, err := q.query(ctx, q.findAllFornecedoresStmt, findAllFornecedores, companyID)
 	if err != nil {
 		return nil, err
 	}
