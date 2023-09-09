@@ -70,3 +70,7 @@ RETURNING id, name, telefone, email, adress, company_id, who_created_id, who_upd
 INSERT INTO client (id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id)
 VALUES ($1, $2, $3, $4, current_timestamp, current_timestamp, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING *;
+
+
+-- name: FindClientsByCompanyid :many
+SELECT * FROM client WHERE company_id = $1 ORDER BY id ASC;

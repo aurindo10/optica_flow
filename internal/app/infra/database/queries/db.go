@@ -42,6 +42,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findAllFornecedoresStmt, err = db.PrepareContext(ctx, findAllFornecedores); err != nil {
 		return nil, fmt.Errorf("error preparing query FindAllFornecedores: %w", err)
 	}
+	if q.findClientsByCompanyidStmt, err = db.PrepareContext(ctx, findClientsByCompanyid); err != nil {
+		return nil, fmt.Errorf("error preparing query FindClientsByCompanyid: %w", err)
+	}
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
 	}
@@ -90,6 +93,11 @@ func (q *Queries) Close() error {
 	if q.findAllFornecedoresStmt != nil {
 		if cerr := q.findAllFornecedoresStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findAllFornecedoresStmt: %w", cerr)
+		}
+	}
+	if q.findClientsByCompanyidStmt != nil {
+		if cerr := q.findClientsByCompanyidStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findClientsByCompanyidStmt: %w", cerr)
 		}
 	}
 	if q.getAllProductsStmt != nil {
@@ -154,35 +162,37 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                       DBTX
-	tx                       *sql.Tx
-	createClientStmt         *sql.Stmt
-	createFornecedorStmt     *sql.Stmt
-	createProductStmt        *sql.Stmt
-	deleteFornecedorByIdStmt *sql.Stmt
-	deleteProductByIdStmt    *sql.Stmt
-	findAllFornecedoresStmt  *sql.Stmt
-	getAllProductsStmt       *sql.Stmt
-	getFornecedorByIDStmt    *sql.Stmt
-	getProductByIDStmt       *sql.Stmt
-	updateFornecedorStmt     *sql.Stmt
-	updateProductStmt        *sql.Stmt
+	db                         DBTX
+	tx                         *sql.Tx
+	createClientStmt           *sql.Stmt
+	createFornecedorStmt       *sql.Stmt
+	createProductStmt          *sql.Stmt
+	deleteFornecedorByIdStmt   *sql.Stmt
+	deleteProductByIdStmt      *sql.Stmt
+	findAllFornecedoresStmt    *sql.Stmt
+	findClientsByCompanyidStmt *sql.Stmt
+	getAllProductsStmt         *sql.Stmt
+	getFornecedorByIDStmt      *sql.Stmt
+	getProductByIDStmt         *sql.Stmt
+	updateFornecedorStmt       *sql.Stmt
+	updateProductStmt          *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                       tx,
-		tx:                       tx,
-		createClientStmt:         q.createClientStmt,
-		createFornecedorStmt:     q.createFornecedorStmt,
-		createProductStmt:        q.createProductStmt,
-		deleteFornecedorByIdStmt: q.deleteFornecedorByIdStmt,
-		deleteProductByIdStmt:    q.deleteProductByIdStmt,
-		findAllFornecedoresStmt:  q.findAllFornecedoresStmt,
-		getAllProductsStmt:       q.getAllProductsStmt,
-		getFornecedorByIDStmt:    q.getFornecedorByIDStmt,
-		getProductByIDStmt:       q.getProductByIDStmt,
-		updateFornecedorStmt:     q.updateFornecedorStmt,
-		updateProductStmt:        q.updateProductStmt,
+		db:                         tx,
+		tx:                         tx,
+		createClientStmt:           q.createClientStmt,
+		createFornecedorStmt:       q.createFornecedorStmt,
+		createProductStmt:          q.createProductStmt,
+		deleteFornecedorByIdStmt:   q.deleteFornecedorByIdStmt,
+		deleteProductByIdStmt:      q.deleteProductByIdStmt,
+		findAllFornecedoresStmt:    q.findAllFornecedoresStmt,
+		findClientsByCompanyidStmt: q.findClientsByCompanyidStmt,
+		getAllProductsStmt:         q.getAllProductsStmt,
+		getFornecedorByIDStmt:      q.getFornecedorByIDStmt,
+		getProductByIDStmt:         q.getProductByIDStmt,
+		updateFornecedorStmt:       q.updateFornecedorStmt,
+		updateProductStmt:          q.updateProductStmt,
 	}
 }

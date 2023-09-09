@@ -7,7 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 type ClientController struct {
-	client *client.Create
+	createClient *client.Create
+	findClients *client.FindClients
 }
 func (r *ClientController) Create(c *fiber.Ctx) error {
 	var request client.Params
@@ -18,15 +19,28 @@ func (r *ClientController) Create(c *fiber.Ctx) error {
 	if error != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
 	}
-	response, err := r.client.Execute(&request)
+	response, err := r.createClient.Execute(&request)
 	if err != nil {
 		return err
 	}
 	return c.Status(fiber.StatusOK).JSON(response)
 }
-func NewClientController(client *client.Create) *ClientController {
+
+func (r *ClientController) Find(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON("id não pode ser vazio")
+	}
+	result, error := r.findClients.FindAll(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
+func NewClientController(createClient *client.Create, findClients *client.FindClients) *ClientController {
 	return &ClientController{
-		client: client,
+		createClient: createClient,
+		findClients: findClients,
 	}
 }
 

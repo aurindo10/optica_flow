@@ -11,7 +11,8 @@ type ClientRouter struct {
 }
 
 func (c *ClientRouter) Load(r *fiber.App) {
-	r.Post("/client", c.controller.Create)	
+	r.Post("/client", c.controller.Create)
+	r.Get("/client/company/:id", c.controller.Find)	
 }
 
 func NewClientRouter(controller *controllers.ClientController) *ClientRouter{
