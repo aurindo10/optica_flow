@@ -589,6 +589,48 @@ func (q *Queries) UpdateFornecedor(ctx context.Context, arg UpdateFornecedorPara
 	return i, err
 }
 
+const updateOneOrder = `-- name: UpdateOneOrder :one
+UPDATE orders
+SET
+  product_name = COALESCE($2, product_name),
+  quantity = COALESCE($3, quantity),
+  who_updated_id = COALESCE($4, who_updated_id),
+  fase = COALESCE($5, fase)
+WHERE id = $1
+RETURNING id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase
+`
+
+type UpdateOneOrderParams struct {
+	ID           uuid.UUID `json:"id"`
+	ProductName  *string   `json:"product_name"`
+	Quantity     *int32    `json:"quantity"`
+	WhoUpdatedID *string   `json:"who_updated_id"`
+	Fase         *string   `json:"fase"`
+}
+
+func (q *Queries) UpdateOneOrder(ctx context.Context, arg UpdateOneOrderParams) (Orders, error) {
+	row := q.queryRow(ctx, q.updateOneOrderStmt, updateOneOrder,
+		arg.ID,
+		arg.ProductName,
+		arg.Quantity,
+		arg.WhoUpdatedID,
+		arg.Fase,
+	)
+	var i Orders
+	err := row.Scan(
+		&i.ID,
+		&i.ProductName,
+		&i.Quantity,
+		&i.OrderDate,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.ClientID,
+		&i.CompanyID,
+		&i.Fase,
+	)
+	return i, err
+}
+
 const updateProduct = `-- name: UpdateProduct :one
 UPDATE product 
 SET 

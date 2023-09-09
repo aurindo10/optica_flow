@@ -114,3 +114,13 @@ RETURNING *;
 
 -- name: FindOneOrderById :one
 SELECT * FROM orders WHERE id = $1 LIMIT 1;
+
+-- name: UpdateOneOrder :one
+UPDATE orders
+SET
+  product_name = COALESCE(sqlc.narg('product_name'), product_name),
+  quantity = COALESCE(sqlc.narg('quantity'), quantity),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id),
+  fase = COALESCE(sqlc.narg('fase'), fase)
+WHERE id = $1
+RETURNING id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase;

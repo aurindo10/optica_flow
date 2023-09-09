@@ -10,6 +10,7 @@ import (
 type OrderController struct {
 	createOrder *orders.CreateOrder
 	findOneOrder *orders.FindOne
+	updateOrder *orders.UpdateOrder
 }
 
 func (r *OrderController) CreateOrder(c *fiber.Ctx)  error {
@@ -68,10 +69,23 @@ func (r *OrderController) FindOneOrder(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
+func (r *OrderController) UpdateOrder(c *fiber.Ctx) error {
+	body := &orders.OrderToUpdate{}
+	error := c.BodyParser(body)
+	if error != nil {
+		return error
+	}
+	result, error := r.updateOrder.Execute(body)
+	if error != nil {
+		return error
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
 
-func NewOrderController(createOrder *orders.CreateOrder, findOneOrder *orders.FindOne) *OrderController {
+func NewOrderController(createOrder *orders.CreateOrder, findOneOrder *orders.FindOne, updateOrder *orders.UpdateOrder) *OrderController {
 	return &OrderController{
 		createOrder: createOrder,
 		findOneOrder: findOneOrder,
+		updateOrder: updateOrder,
 	}
 }

@@ -58,6 +58,31 @@ func (c *OrderRepository) FindOne(id uuid.UUID) (*orders.Order, error){
 	}
 	return response, nil
 }
+func (c *OrderRepository ) Update(p *orders.OrderToUpdate) (*orders.Order, error){
+	params := database.UpdateOneOrderParams{
+		ID: p.ID,
+		ProductName: p.ProductName,
+		Quantity: p.Quantity,
+		WhoUpdatedID: p.WhoUpdatedID,
+		Fase: p.Fase,
+	}
+	result, error := c.db.UpdateOneOrder(context.Background(), params)
+	if error != nil {
+		return nil, error
+	}
+	response := &orders.Order{
+		ID: result.ID,
+		ClientID: result.ClientID,
+		ProductName: result.ProductName,
+		Quantity: result.Quantity,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+		CompanyID: result.CompanyID,
+		Fase: result.Fase,
+		OrderDate: result.OrderDate,
+	}
+	return response, nil
+}
 func NewOrderRepository (db *database.Queries) *OrderRepository {
 	return &OrderRepository{
 		db: db,

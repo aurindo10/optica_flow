@@ -27,7 +27,13 @@ type Params struct {
 	CompanyID    string    `json:"company_id"`
 	Fase         string    `json:"fase"`
 }
-
+type OrderToUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	ProductName  *string   `json:"product_name"`
+	Quantity     *int32    `json:"quantity"`
+	WhoUpdatedID *string   `json:"who_updated_id"`
+	Fase         *string   `json:"fase"`
+}
 func NewOrder(p *Params) *Order {
 	return &Order{
 		ID:           uuid.New(),
