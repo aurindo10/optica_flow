@@ -111,3 +111,6 @@ INSERT INTO orders (id, product_name, quantity, order_date, who_created_id, who_
 SELECT $2, $3, $4, current_timestamp, $5, $6, $1, $7, $8
 FROM valid_client
 RETURNING *;
+
+-- name: FindOneOrderById :one
+SELECT * FROM orders WHERE id = $1 LIMIT 1;

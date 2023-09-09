@@ -4,10 +4,12 @@ import (
 	"optica_flow/internal/app/domain/orders"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type OrderController struct {
 	createOrder *orders.CreateOrder
+	findOneOrder *orders.FindOne
 }
 
 func (r *OrderController) CreateOrder(c *fiber.Ctx)  error {
@@ -51,9 +53,25 @@ func (r *OrderController) ValidateFields(result * orders.Params) error {
 	}
 	return nil
 }
+func (r *OrderController) FindOneOrder(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return fiber.NewError(400, "id is required")
+	}
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return fiber.NewError(400, "id is invalid")
+	}
+	result, error := r.findOneOrder.Execute(idParsed)
+	if error != nil {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
 
-func NewOrderController(createOrder *orders.CreateOrder) *OrderController {
+func NewOrderController(createOrder *orders.CreateOrder, findOneOrder *orders.FindOne) *OrderController {
 	return &OrderController{
 		createOrder: createOrder,
+		findOneOrder: findOneOrder,
 	}
 }

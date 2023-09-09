@@ -12,6 +12,7 @@ type OrderRouter struct {
 
 func (c *OrderRouter) Load(r *fiber.App) {
 	r.Post("/order", c.constroller.CreateOrder)
+	r.Get("/order/:id", c.constroller.FindOneOrder)
 }
 
 func NewOrderRouter(constroller *controllers.OrderController) *OrderRouter {

@@ -360,6 +360,27 @@ func (q *Queries) FindOneClientById(ctx context.Context, id uuid.UUID) (Client, 
 	return i, err
 }
 
+const findOneOrderById = `-- name: FindOneOrderById :one
+SELECT id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase FROM orders WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) FindOneOrderById(ctx context.Context, id uuid.UUID) (Orders, error) {
+	row := q.queryRow(ctx, q.findOneOrderByIdStmt, findOneOrderById, id)
+	var i Orders
+	err := row.Scan(
+		&i.ID,
+		&i.ProductName,
+		&i.Quantity,
+		&i.OrderDate,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.ClientID,
+		&i.CompanyID,
+		&i.Fase,
+	)
+	return i, err
+}
+
 const getAllProducts = `-- name: GetAllProducts :many
 SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product WHERE company_id = $1 ORDER BY id ASC
 `
