@@ -74,3 +74,25 @@ RETURNING *;
 
 -- name: FindClientsByCompanyid :many
 SELECT * FROM client WHERE company_id = $1 ORDER BY id ASC;
+
+-- name: UpdateClientById :one
+UPDATE client
+SET
+  full_name = COALESCE(sqlc.narg('full_name'), full_name),
+  telefone = COALESCE(sqlc.narg('telefone'), telefone),
+  cpf = COALESCE(sqlc.narg('cpf'), cpf),
+  updated_at = current_timestamp,
+  email = COALESCE(sqlc.narg('email'), email),
+  birth_date = COALESCE(sqlc.narg('birth_date'), birth_date),
+  adress = COALESCE(sqlc.narg('adress'), adress),
+  gender = COALESCE(sqlc.narg('gender'), gender),
+  city = COALESCE(sqlc.narg('city'), city),
+  seller_id = COALESCE(sqlc.narg('seller_id'), seller_id),
+  company_id = COALESCE(sqlc.narg('company_id'), company_id),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id)
+WHERE id = $1
+RETURNING id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id;
+
+
+-- name: FindOneClientById :one
+SELECT * FROM client WHERE id = $1 LIMIT 1;

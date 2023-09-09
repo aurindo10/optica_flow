@@ -54,7 +54,7 @@ func NewClient(resquest *Params) *Client {
 		Email:        resquest.Email,
 		BirthDate:    resquest.BirthDate,
 		Adress:       resquest.Adress,
-		Gender:   		resquest.Cpf,
+		Gender:   	  resquest.Gender,
 		City:         resquest.City,
 		SellerID:     resquest.SellerID,
 		CompanyID:    resquest.CompanyID,

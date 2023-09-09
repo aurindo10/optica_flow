@@ -4,6 +4,8 @@ import (
 	"context"
 	"optica_flow/internal/app/domain/client"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 type ClientRepository struct {
@@ -56,6 +58,68 @@ func (c *ClientRepository) Find(id string) ([]*client.Client, error){
 	}
 	response := c.mapResult(&result)
 	return response, nil
+}
+func (c *ClientRepository) Update(request *client.ClientToUpdate) (*client.Client, error) {
+	clientToUpdate := database.UpdateClientByIdParams{
+		ID: request.ID,
+		FullName: request.FullName,
+		Telefone: request.Telefone,
+		Cpf: request.Cpf,
+		Email: request.Email,
+		BirthDate: request.BirthDate,
+		Adress: request.Adress,
+		Gender: request.Gender,
+		City: request.City,
+		SellerID: request.SellerID,
+		CompanyID: request.CompanyID,
+		WhoUpdatedID: request.WhoUpdatedID,
+	}
+	result, error := c.db.UpdateClientById(context.Background(), clientToUpdate)
+	if error != nil {
+		return nil, error
+	}
+	response := client.Client{
+		ID: result.ID,
+		FullName: result.FullName,
+		Telefone: result.Telefone,
+		Cpf: result.Cpf,
+		Email: result.Email,
+		BirthDate: result.BirthDate,
+		CreatedAt: result.CreatedAt,
+		UpdatedAt: result.UpdatedAt,
+		Adress: result.Adress,
+		Gender: result.Gender,
+		City: result.City,
+		SellerID: result.SellerID,
+		CompanyID: result.CompanyID,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+	}
+	return &response, error
+}
+func (c *ClientRepository) FindOne(id uuid.UUID) (*client.Client, error) {
+	result, error := c.db.FindOneClientById(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	response := client.Client{
+		ID: result.ID,
+		FullName: result.FullName,
+		Telefone: result.Telefone,
+		Cpf: result.Cpf,
+		Email: result.Email,
+		BirthDate: result.BirthDate,
+		CreatedAt: result.CreatedAt,
+		UpdatedAt: result.UpdatedAt,
+		Adress: result.Adress,
+		Gender: result.Gender,
+		City: result.City,
+		SellerID: result.SellerID,
+		CompanyID: result.CompanyID,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+	}
+	return &response, nil
 }
 func NewCLientRepository(db *database.Queries) *ClientRepository {
 	return &ClientRepository{

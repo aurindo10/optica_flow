@@ -275,6 +275,33 @@ func (q *Queries) FindClientsByCompanyid(ctx context.Context, companyID string) 
 	return items, nil
 }
 
+const findOneClientById = `-- name: FindOneClientById :one
+SELECT id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id FROM client WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) FindOneClientById(ctx context.Context, id uuid.UUID) (Client, error) {
+	row := q.queryRow(ctx, q.findOneClientByIdStmt, findOneClientById, id)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.Telefone,
+		&i.Cpf,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.BirthDate,
+		&i.Adress,
+		&i.Gender,
+		&i.City,
+		&i.SellerID,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+	)
+	return i, err
+}
+
 const getAllProducts = `-- name: GetAllProducts :many
 SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product WHERE company_id = $1 ORDER BY id ASC
 `
@@ -355,6 +382,76 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, er
 		&i.UpdatedAt,
 		&i.BarCode,
 		&i.Quantity,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+	)
+	return i, err
+}
+
+const updateClientById = `-- name: UpdateClientById :one
+UPDATE client
+SET
+  full_name = COALESCE($2, full_name),
+  telefone = COALESCE($3, telefone),
+  cpf = COALESCE($4, cpf),
+  updated_at = current_timestamp,
+  email = COALESCE($5, email),
+  birth_date = COALESCE($6, birth_date),
+  adress = COALESCE($7, adress),
+  gender = COALESCE($8, gender),
+  city = COALESCE($9, city),
+  seller_id = COALESCE($10, seller_id),
+  company_id = COALESCE($11, company_id),
+  who_updated_id = COALESCE($12, who_updated_id)
+WHERE id = $1
+RETURNING id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id
+`
+
+type UpdateClientByIdParams struct {
+	ID           uuid.UUID  `json:"id"`
+	FullName     *string    `json:"full_name"`
+	Telefone     *string    `json:"telefone"`
+	Cpf          *string    `json:"cpf"`
+	Email        *string    `json:"email"`
+	BirthDate    *time.Time `json:"birth_date"`
+	Adress       *string    `json:"adress"`
+	Gender       *string    `json:"gender"`
+	City         *string    `json:"city"`
+	SellerID     *string    `json:"seller_id"`
+	CompanyID    *string    `json:"company_id"`
+	WhoUpdatedID *string    `json:"who_updated_id"`
+}
+
+func (q *Queries) UpdateClientById(ctx context.Context, arg UpdateClientByIdParams) (Client, error) {
+	row := q.queryRow(ctx, q.updateClientByIdStmt, updateClientById,
+		arg.ID,
+		arg.FullName,
+		arg.Telefone,
+		arg.Cpf,
+		arg.Email,
+		arg.BirthDate,
+		arg.Adress,
+		arg.Gender,
+		arg.City,
+		arg.SellerID,
+		arg.CompanyID,
+		arg.WhoUpdatedID,
+	)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.Telefone,
+		&i.Cpf,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.BirthDate,
+		&i.Adress,
+		&i.Gender,
+		&i.City,
+		&i.SellerID,
 		&i.CompanyID,
 		&i.WhoCreatedID,
 		&i.WhoUpdatedID,

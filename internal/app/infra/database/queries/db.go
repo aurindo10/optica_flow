@@ -45,6 +45,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findClientsByCompanyidStmt, err = db.PrepareContext(ctx, findClientsByCompanyid); err != nil {
 		return nil, fmt.Errorf("error preparing query FindClientsByCompanyid: %w", err)
 	}
+	if q.findOneClientByIdStmt, err = db.PrepareContext(ctx, findOneClientById); err != nil {
+		return nil, fmt.Errorf("error preparing query FindOneClientById: %w", err)
+	}
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
 	}
@@ -53,6 +56,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getProductByIDStmt, err = db.PrepareContext(ctx, getProductByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductByID: %w", err)
+	}
+	if q.updateClientByIdStmt, err = db.PrepareContext(ctx, updateClientById); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateClientById: %w", err)
 	}
 	if q.updateFornecedorStmt, err = db.PrepareContext(ctx, updateFornecedor); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateFornecedor: %w", err)
@@ -100,6 +106,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing findClientsByCompanyidStmt: %w", cerr)
 		}
 	}
+	if q.findOneClientByIdStmt != nil {
+		if cerr := q.findOneClientByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findOneClientByIdStmt: %w", cerr)
+		}
+	}
 	if q.getAllProductsStmt != nil {
 		if cerr := q.getAllProductsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAllProductsStmt: %w", cerr)
@@ -113,6 +124,11 @@ func (q *Queries) Close() error {
 	if q.getProductByIDStmt != nil {
 		if cerr := q.getProductByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductByIDStmt: %w", cerr)
+		}
+	}
+	if q.updateClientByIdStmt != nil {
+		if cerr := q.updateClientByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateClientByIdStmt: %w", cerr)
 		}
 	}
 	if q.updateFornecedorStmt != nil {
@@ -171,9 +187,11 @@ type Queries struct {
 	deleteProductByIdStmt      *sql.Stmt
 	findAllFornecedoresStmt    *sql.Stmt
 	findClientsByCompanyidStmt *sql.Stmt
+	findOneClientByIdStmt      *sql.Stmt
 	getAllProductsStmt         *sql.Stmt
 	getFornecedorByIDStmt      *sql.Stmt
 	getProductByIDStmt         *sql.Stmt
+	updateClientByIdStmt       *sql.Stmt
 	updateFornecedorStmt       *sql.Stmt
 	updateProductStmt          *sql.Stmt
 }
@@ -189,9 +207,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteProductByIdStmt:      q.deleteProductByIdStmt,
 		findAllFornecedoresStmt:    q.findAllFornecedoresStmt,
 		findClientsByCompanyidStmt: q.findClientsByCompanyidStmt,
+		findOneClientByIdStmt:      q.findOneClientByIdStmt,
 		getAllProductsStmt:         q.getAllProductsStmt,
 		getFornecedorByIDStmt:      q.getFornecedorByIDStmt,
 		getProductByIDStmt:         q.getProductByIDStmt,
+		updateClientByIdStmt:       q.updateClientByIdStmt,
 		updateFornecedorStmt:       q.updateFornecedorStmt,
 		updateProductStmt:          q.updateProductStmt,
 	}
