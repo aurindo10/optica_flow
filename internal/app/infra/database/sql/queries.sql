@@ -100,3 +100,14 @@ SELECT * FROM client WHERE id = $1 LIMIT 1;
 
 -- name: DeleteOneClient :exec
 DELETE FROM client WHERE id = $1;
+
+-- name: CreateOrder :one
+WITH valid_client AS (
+  SELECT id
+  FROM client
+  WHERE id = $1
+)
+INSERT INTO orders (id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase)
+SELECT $2, $3, $4, current_timestamp, $5, $6, $1, $7, $8
+FROM valid_client
+RETURNING *;

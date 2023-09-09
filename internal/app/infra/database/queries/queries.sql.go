@@ -116,6 +116,55 @@ func (q *Queries) CreateFornecedor(ctx context.Context, arg CreateFornecedorPara
 	return i, err
 }
 
+const createOrder = `-- name: CreateOrder :one
+WITH valid_client AS (
+  SELECT id
+  FROM client
+  WHERE id = $1
+)
+INSERT INTO orders (id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase)
+SELECT $2, $3, $4, current_timestamp, $5, $6, $1, $7, $8
+FROM valid_client
+RETURNING id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase
+`
+
+type CreateOrderParams struct {
+	ClientID     *string   `json:"client_id"`
+	ID           uuid.UUID `json:"id"`
+	ProductName  string    `json:"product_name"`
+	Quantity     int32     `json:"quantity"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	CompanyID    string    `json:"company_id"`
+	Fase         string    `json:"fase"`
+}
+
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Orders, error) {
+	row := q.queryRow(ctx, q.createOrderStmt, createOrder,
+		arg.ClientID,
+		arg.ID,
+		arg.ProductName,
+		arg.Quantity,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
+		arg.CompanyID,
+		arg.Fase,
+	)
+	var i Orders
+	err := row.Scan(
+		&i.ID,
+		&i.ProductName,
+		&i.Quantity,
+		&i.OrderDate,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.ClientID,
+		&i.CompanyID,
+		&i.Fase,
+	)
+	return i, err
+}
+
 const createProduct = `-- name: CreateProduct :one
 WITH valid_fornecedor AS (
   SELECT id

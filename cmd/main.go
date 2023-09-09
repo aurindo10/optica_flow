@@ -3,10 +3,12 @@ package main
 import (
 	"optica_flow/internal/app/domain/client"
 	"optica_flow/internal/app/domain/fornecedor"
+	"optica_flow/internal/app/domain/orders"
 	"optica_flow/internal/app/domain/product"
 	"optica_flow/internal/app/infra/database"
 	clientrepository "optica_flow/internal/app/infra/database/clientRepository"
 	fornecedorrepository "optica_flow/internal/app/infra/database/fornecedorRepository"
+	orderrepository "optica_flow/internal/app/infra/database/orderRepository"
 	"optica_flow/internal/app/infra/httpapi"
 	controllers "optica_flow/internal/app/infra/httpapi/contorllers"
 	"optica_flow/internal/app/infra/httpapi/middleware"
@@ -28,6 +30,8 @@ func main() {
 		client.Module,
 		fornecedorrepository.Module,
 		clientrepository.Module,
+		orders.Module,
+		orderrepository.Module,
 		fx.Invoke(func(*fasthttp.Server){}),
 	)
 	app.Run()

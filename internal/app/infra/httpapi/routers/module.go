@@ -7,4 +7,5 @@ var Module = fx.Provide(
 	MakeRouter,
 	NewFornecedorRouter,
 	NewClientRouter,
+	NewOrderRouter,
 )
