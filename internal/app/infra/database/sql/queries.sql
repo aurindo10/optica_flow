@@ -96,3 +96,7 @@ RETURNING id, full_name, telefone, cpf, created_at, updated_at, email, birth_dat
 
 -- name: FindOneClientById :one
 SELECT * FROM client WHERE id = $1 LIMIT 1;
+
+
+-- name: DeleteOneClient :exec
+DELETE FROM client WHERE id = $1;

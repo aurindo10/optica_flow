@@ -7,5 +7,6 @@ type Repository interface {
 	Find(id string) ([]*Client, error)
 	Update(client *ClientToUpdate) (*Client, error)
 	FindOne (id uuid.UUID) (*Client, error)
+	DeleteOne(id uuid.UUID) (error)
 }
 

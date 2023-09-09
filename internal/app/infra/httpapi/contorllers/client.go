@@ -12,6 +12,7 @@ type ClientController struct {
 	findClients *client.FindClients
 	updateClient *client.UpdateClient
 	findOneClient *client.FindOne
+	deleteClient *client.DeleteClient
 }
 func (r *ClientController) Create(c *fiber.Ctx) error {
 	var request client.Params
@@ -70,13 +71,29 @@ func (r *ClientController) FindOne(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
+func (r *ClientController) DeleteOne(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON("id não pode ser vazio")
+	}
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
+	}
+	error = r.deleteClient.Execute(idParsed)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON("deletado com sucesso")
+}
 
-func NewClientController(createClient *client.Create, findClients *client.FindClients, updateClient *client.UpdateClient, findOneClient *client.FindOne) *ClientController {
+func NewClientController(createClient *client.Create, findClients *client.FindClients, updateClient *client.UpdateClient, findOneClient *client.FindOne, deleteClient *client.DeleteClient) *ClientController {
 	return &ClientController{
 		createClient: createClient,
 		findClients: findClients,
 		updateClient: updateClient,
 		findOneClient: findOneClient,
+		deleteClient: deleteClient,
 	}
 }
 

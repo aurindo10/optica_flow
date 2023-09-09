@@ -15,6 +15,7 @@ func (c *ClientRouter) Load(r *fiber.App) {
 	r.Get("/client/company/:id", c.controller.Find)	
 	r.Put("/client", c.controller.Update)
 	r.Get("/client/:id", c.controller.FindOne)
+	r.Delete("/client/:id", c.controller.DeleteOne)
 }
 
 func NewClientRouter(controller *controllers.ClientController) *ClientRouter{

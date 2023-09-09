@@ -8,4 +8,5 @@ var Module = fx.Provide(
 	NewFindClients,
 	NewUpdateClient,
 	NewFindOne,
+	NewDeleteClient,
 )

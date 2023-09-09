@@ -121,6 +121,13 @@ func (c *ClientRepository) FindOne(id uuid.UUID) (*client.Client, error) {
 	}
 	return &response, nil
 }
+func (c *ClientRepository) DeleteOne(id uuid.UUID) (error) {
+	error := c.db.DeleteOneClient(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
+}
 func NewCLientRepository(db *database.Queries) *ClientRepository {
 	return &ClientRepository{
 		db: db,
