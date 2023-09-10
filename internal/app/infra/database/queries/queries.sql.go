@@ -224,6 +224,44 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	return i, err
 }
 
+const createProductOrder = `-- name: CreateProductOrder :one
+WITH valid_product AS (
+  SELECT id FROM product WHERE id = $1
+),
+valid_order AS (
+  SELECT id FROM orders WHERE id = $2
+)
+INSERT INTO product_order (id, amout, product_id, order_id)
+SELECT $3, $4, $1, $2
+FROM valid_product, valid_order
+WHERE valid_product.id IS NOT NULL AND valid_order.id IS NOT NULL
+RETURNING id, amout, product_id, order_id
+`
+
+type CreateProductOrderParams struct {
+	ProductID *string   `json:"product_id"`
+	OrderID   *string   `json:"order_id"`
+	ID        uuid.UUID `json:"id"`
+	Amout     int32     `json:"amout"`
+}
+
+func (q *Queries) CreateProductOrder(ctx context.Context, arg CreateProductOrderParams) (ProductOrder, error) {
+	row := q.queryRow(ctx, q.createProductOrderStmt, createProductOrder,
+		arg.ProductID,
+		arg.OrderID,
+		arg.ID,
+		arg.Amout,
+	)
+	var i ProductOrder
+	err := row.Scan(
+		&i.ID,
+		&i.Amout,
+		&i.ProductID,
+		&i.OrderID,
+	)
+	return i, err
+}
+
 const deleteFornecedorById = `-- name: DeleteFornecedorById :exec
 DELETE FROM fornecedor
 WHERE id = $1

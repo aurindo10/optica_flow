@@ -130,3 +130,16 @@ SELECT * FROM orders WHERE company_id = $1 ORDER BY id ASC;
 
 -- name: DeleteOrderById :exec
 DELETE FROM orders WHERE id = $1;
+
+-- name: CreateProductOrder :one
+WITH valid_product AS (
+  SELECT id FROM product WHERE id = $1
+),
+valid_order AS (
+  SELECT id FROM orders WHERE id = $2
+)
+INSERT INTO product_order (id, amout, product_id, order_id)
+SELECT $3, $4, $1, $2
+FROM valid_product, valid_order
+WHERE valid_product.id IS NOT NULL AND valid_order.id IS NOT NULL
+RETURNING *;

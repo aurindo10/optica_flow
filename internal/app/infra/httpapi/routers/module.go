@@ -8,4 +8,5 @@ var Module = fx.Provide(
 	NewFornecedorRouter,
 	NewClientRouter,
 	NewOrderRouter,
+	NewProductOrderRouter,
 )
