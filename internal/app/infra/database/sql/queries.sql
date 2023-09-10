@@ -124,3 +124,6 @@ SET
   fase = COALESCE(sqlc.narg('fase'), fase)
 WHERE id = $1
 RETURNING id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase;
+
+-- name: FindAllORdersByCompanyid :many
+SELECT * FROM orders WHERE company_id = $1 ORDER BY id ASC;

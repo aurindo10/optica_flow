@@ -83,8 +83,35 @@ func (c *OrderRepository ) Update(p *orders.OrderToUpdate) (*orders.Order, error
 	}
 	return response, nil
 }
+func (c *OrderRepository) FindAll(companyId string) ([]*orders.Order, error) {
+	result, error := c.db.FindAllORdersByCompanyid(context.Background(), companyId)
+	if error != nil {
+		return nil, error
+	}
+	response := c.mapResult(&result)
+	return response, nil
+}
+
 func NewOrderRepository (db *database.Queries) *OrderRepository {
 	return &OrderRepository{
 		db: db,
 	}
+}
+
+func (c *OrderRepository) mapResult(result *[]database.Orders) []*orders.Order {
+	var ordersResponse []*orders.Order
+	for _, v := range *result {
+		ordersResponse = append(ordersResponse, &orders.Order{
+			ID: v.ID,
+			ClientID: v.ClientID,
+			ProductName: v.ProductName,
+			Quantity: v.Quantity,
+			WhoCreatedID: v.WhoCreatedID,
+			WhoUpdatedID: v.WhoUpdatedID,
+			CompanyID: v.CompanyID,
+			Fase: v.Fase,
+			OrderDate: v.OrderDate,
+		})
+	}
+	return ordersResponse
 }

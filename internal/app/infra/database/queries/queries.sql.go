@@ -290,6 +290,43 @@ func (q *Queries) FindAllFornecedores(ctx context.Context, companyID string) ([]
 	return items, nil
 }
 
+const findAllORdersByCompanyid = `-- name: FindAllORdersByCompanyid :many
+SELECT id, product_name, quantity, order_date, who_created_id, who_updated_id, client_id, company_id, fase FROM orders WHERE company_id = $1 ORDER BY id ASC
+`
+
+func (q *Queries) FindAllORdersByCompanyid(ctx context.Context, companyID string) ([]Orders, error) {
+	rows, err := q.query(ctx, q.findAllORdersByCompanyidStmt, findAllORdersByCompanyid, companyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Orders
+	for rows.Next() {
+		var i Orders
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductName,
+			&i.Quantity,
+			&i.OrderDate,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
+			&i.ClientID,
+			&i.CompanyID,
+			&i.Fase,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findClientsByCompanyid = `-- name: FindClientsByCompanyid :many
 SELECT id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id FROM client WHERE company_id = $1 ORDER BY id ASC
 `

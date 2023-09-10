@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findAllFornecedoresStmt, err = db.PrepareContext(ctx, findAllFornecedores); err != nil {
 		return nil, fmt.Errorf("error preparing query FindAllFornecedores: %w", err)
 	}
+	if q.findAllORdersByCompanyidStmt, err = db.PrepareContext(ctx, findAllORdersByCompanyid); err != nil {
+		return nil, fmt.Errorf("error preparing query FindAllORdersByCompanyid: %w", err)
+	}
 	if q.findClientsByCompanyidStmt, err = db.PrepareContext(ctx, findClientsByCompanyid); err != nil {
 		return nil, fmt.Errorf("error preparing query FindClientsByCompanyid: %w", err)
 	}
@@ -121,6 +124,11 @@ func (q *Queries) Close() error {
 	if q.findAllFornecedoresStmt != nil {
 		if cerr := q.findAllFornecedoresStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findAllFornecedoresStmt: %w", cerr)
+		}
+	}
+	if q.findAllORdersByCompanyidStmt != nil {
+		if cerr := q.findAllORdersByCompanyidStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findAllORdersByCompanyidStmt: %w", cerr)
 		}
 	}
 	if q.findClientsByCompanyidStmt != nil {
@@ -210,49 +218,51 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                         DBTX
-	tx                         *sql.Tx
-	createClientStmt           *sql.Stmt
-	createFornecedorStmt       *sql.Stmt
-	createOrderStmt            *sql.Stmt
-	createProductStmt          *sql.Stmt
-	deleteFornecedorByIdStmt   *sql.Stmt
-	deleteOneClientStmt        *sql.Stmt
-	deleteProductByIdStmt      *sql.Stmt
-	findAllFornecedoresStmt    *sql.Stmt
-	findClientsByCompanyidStmt *sql.Stmt
-	findOneClientByIdStmt      *sql.Stmt
-	findOneOrderByIdStmt       *sql.Stmt
-	getAllProductsStmt         *sql.Stmt
-	getFornecedorByIDStmt      *sql.Stmt
-	getProductByIDStmt         *sql.Stmt
-	updateClientByIdStmt       *sql.Stmt
-	updateFornecedorStmt       *sql.Stmt
-	updateOneOrderStmt         *sql.Stmt
-	updateProductStmt          *sql.Stmt
+	db                           DBTX
+	tx                           *sql.Tx
+	createClientStmt             *sql.Stmt
+	createFornecedorStmt         *sql.Stmt
+	createOrderStmt              *sql.Stmt
+	createProductStmt            *sql.Stmt
+	deleteFornecedorByIdStmt     *sql.Stmt
+	deleteOneClientStmt          *sql.Stmt
+	deleteProductByIdStmt        *sql.Stmt
+	findAllFornecedoresStmt      *sql.Stmt
+	findAllORdersByCompanyidStmt *sql.Stmt
+	findClientsByCompanyidStmt   *sql.Stmt
+	findOneClientByIdStmt        *sql.Stmt
+	findOneOrderByIdStmt         *sql.Stmt
+	getAllProductsStmt           *sql.Stmt
+	getFornecedorByIDStmt        *sql.Stmt
+	getProductByIDStmt           *sql.Stmt
+	updateClientByIdStmt         *sql.Stmt
+	updateFornecedorStmt         *sql.Stmt
+	updateOneOrderStmt           *sql.Stmt
+	updateProductStmt            *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                         tx,
-		tx:                         tx,
-		createClientStmt:           q.createClientStmt,
-		createFornecedorStmt:       q.createFornecedorStmt,
-		createOrderStmt:            q.createOrderStmt,
-		createProductStmt:          q.createProductStmt,
-		deleteFornecedorByIdStmt:   q.deleteFornecedorByIdStmt,
-		deleteOneClientStmt:        q.deleteOneClientStmt,
-		deleteProductByIdStmt:      q.deleteProductByIdStmt,
-		findAllFornecedoresStmt:    q.findAllFornecedoresStmt,
-		findClientsByCompanyidStmt: q.findClientsByCompanyidStmt,
-		findOneClientByIdStmt:      q.findOneClientByIdStmt,
-		findOneOrderByIdStmt:       q.findOneOrderByIdStmt,
-		getAllProductsStmt:         q.getAllProductsStmt,
-		getFornecedorByIDStmt:      q.getFornecedorByIDStmt,
-		getProductByIDStmt:         q.getProductByIDStmt,
-		updateClientByIdStmt:       q.updateClientByIdStmt,
-		updateFornecedorStmt:       q.updateFornecedorStmt,
-		updateOneOrderStmt:         q.updateOneOrderStmt,
-		updateProductStmt:          q.updateProductStmt,
+		db:                           tx,
+		tx:                           tx,
+		createClientStmt:             q.createClientStmt,
+		createFornecedorStmt:         q.createFornecedorStmt,
+		createOrderStmt:              q.createOrderStmt,
+		createProductStmt:            q.createProductStmt,
+		deleteFornecedorByIdStmt:     q.deleteFornecedorByIdStmt,
+		deleteOneClientStmt:          q.deleteOneClientStmt,
+		deleteProductByIdStmt:        q.deleteProductByIdStmt,
+		findAllFornecedoresStmt:      q.findAllFornecedoresStmt,
+		findAllORdersByCompanyidStmt: q.findAllORdersByCompanyidStmt,
+		findClientsByCompanyidStmt:   q.findClientsByCompanyidStmt,
+		findOneClientByIdStmt:        q.findOneClientByIdStmt,
+		findOneOrderByIdStmt:         q.findOneOrderByIdStmt,
+		getAllProductsStmt:           q.getAllProductsStmt,
+		getFornecedorByIDStmt:        q.getFornecedorByIDStmt,
+		getProductByIDStmt:           q.getProductByIDStmt,
+		updateClientByIdStmt:         q.updateClientByIdStmt,
+		updateFornecedorStmt:         q.updateFornecedorStmt,
+		updateOneOrderStmt:           q.updateOneOrderStmt,
+		updateProductStmt:            q.updateProductStmt,
 	}
 }
