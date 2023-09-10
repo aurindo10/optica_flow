@@ -91,12 +91,19 @@ func (c *OrderRepository) FindAll(companyId string) ([]*orders.Order, error) {
 	response := c.mapResult(&result)
 	return response, nil
 }
-
+func (c *OrderRepository) Delete(id uuid.UUID) error {
+	error := c.db.DeleteOrderById(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
+}
 func NewOrderRepository (db *database.Queries) *OrderRepository {
 	return &OrderRepository{
 		db: db,
 	}
 }
+
 
 func (c *OrderRepository) mapResult(result *[]database.Orders) []*orders.Order {
 	var ordersResponse []*orders.Order

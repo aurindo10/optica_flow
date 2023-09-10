@@ -8,4 +8,5 @@ type Repository interface {
 	FindOne (id uuid.UUID) (*Order, error)
 	Update (*OrderToUpdate) (*Order, error)
 	FindAll (companyId string) ([]*Order, error)
+	Delete (id uuid.UUID) error
 }

@@ -12,6 +12,7 @@ type OrderController struct {
 	findOneOrder *orders.FindOne
 	updateOrder *orders.UpdateOrder
 	findAllOrders *orders.FindAllOrders
+	deleteOrder *orders.DeleteOrder
 }
 
 func (r *OrderController) CreateOrder(c *fiber.Ctx)  error {
@@ -93,11 +94,27 @@ func (r *OrderController) FindAllOrders(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
-func NewOrderController(createOrder *orders.CreateOrder, findOneOrder *orders.FindOne, updateOrder *orders.UpdateOrder, findAllOrders *orders.FindAllOrders) *OrderController {
+func (r *OrderController) DeleteOrder(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return fiber.NewError(400, "id is required")
+	}
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return fiber.NewError(400, "id is invalid")
+	}
+	error = r.deleteOrder.Execute(idParsed)
+	if error != nil {
+		return error
+	}
+	return c.SendStatus(fiber.StatusOK)
+}
+func NewOrderController(createOrder *orders.CreateOrder, findOneOrder *orders.FindOne, updateOrder *orders.UpdateOrder, findAllOrders *orders.FindAllOrders, deleteOrder *orders.DeleteOrder ) *OrderController {
 	return &OrderController{
 		createOrder: createOrder,
 		findOneOrder: findOneOrder,
 		updateOrder: updateOrder,
 		findAllOrders: findAllOrders,
+		deleteOrder: deleteOrder,
 	}
 }

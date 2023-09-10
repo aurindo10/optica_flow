@@ -15,6 +15,7 @@ func (c *OrderRouter) Load(r *fiber.App) {
 	r.Get("/order/:id", c.constroller.FindOneOrder)
 	r.Put("/order", c.constroller.UpdateOrder)
 	r.Get("/orders/company/:id", c.constroller.FindAllOrders)
+	r.Delete("/order/:id", c.constroller.DeleteOrder)
 }
 
 func NewOrderRouter(constroller *controllers.OrderController) *OrderRouter {

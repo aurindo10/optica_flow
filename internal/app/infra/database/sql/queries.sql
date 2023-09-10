@@ -127,3 +127,6 @@ RETURNING id, product_name, quantity, order_date, who_created_id, who_updated_id
 
 -- name: FindAllORdersByCompanyid :many
 SELECT * FROM orders WHERE company_id = $1 ORDER BY id ASC;
+
+-- name: DeleteOrderById :exec
+DELETE FROM orders WHERE id = $1;
