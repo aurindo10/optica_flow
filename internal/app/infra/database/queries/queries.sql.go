@@ -374,6 +374,38 @@ func (q *Queries) FindAllORdersByCompanyid(ctx context.Context, companyID string
 	return items, nil
 }
 
+const findAllProductOrdersByOrderId = `-- name: FindAllProductOrdersByOrderId :many
+SELECT id, amout, product_id, order_id FROM product_order WHERE order_id = $1 ORDER BY id ASC
+`
+
+func (q *Queries) FindAllProductOrdersByOrderId(ctx context.Context, orderID *string) ([]ProductOrder, error) {
+	rows, err := q.query(ctx, q.findAllProductOrdersByOrderIdStmt, findAllProductOrdersByOrderId, orderID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ProductOrder
+	for rows.Next() {
+		var i ProductOrder
+		if err := rows.Scan(
+			&i.ID,
+			&i.Amout,
+			&i.ProductID,
+			&i.OrderID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findClientsByCompanyid = `-- name: FindClientsByCompanyid :many
 SELECT id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id FROM client WHERE company_id = $1 ORDER BY id ASC
 `

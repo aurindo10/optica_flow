@@ -57,6 +57,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findAllORdersByCompanyidStmt, err = db.PrepareContext(ctx, findAllORdersByCompanyid); err != nil {
 		return nil, fmt.Errorf("error preparing query FindAllORdersByCompanyid: %w", err)
 	}
+	if q.findAllProductOrdersByOrderIdStmt, err = db.PrepareContext(ctx, findAllProductOrdersByOrderId); err != nil {
+		return nil, fmt.Errorf("error preparing query FindAllProductOrdersByOrderId: %w", err)
+	}
 	if q.findClientsByCompanyidStmt, err = db.PrepareContext(ctx, findClientsByCompanyid); err != nil {
 		return nil, fmt.Errorf("error preparing query FindClientsByCompanyid: %w", err)
 	}
@@ -147,6 +150,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing findAllORdersByCompanyidStmt: %w", cerr)
 		}
 	}
+	if q.findAllProductOrdersByOrderIdStmt != nil {
+		if cerr := q.findAllProductOrdersByOrderIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findAllProductOrdersByOrderIdStmt: %w", cerr)
+		}
+	}
 	if q.findClientsByCompanyidStmt != nil {
 		if cerr := q.findClientsByCompanyidStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findClientsByCompanyidStmt: %w", cerr)
@@ -234,55 +242,57 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                           DBTX
-	tx                           *sql.Tx
-	createClientStmt             *sql.Stmt
-	createFornecedorStmt         *sql.Stmt
-	createOrderStmt              *sql.Stmt
-	createProductStmt            *sql.Stmt
-	createProductOrderStmt       *sql.Stmt
-	deleteFornecedorByIdStmt     *sql.Stmt
-	deleteOneClientStmt          *sql.Stmt
-	deleteOrderByIdStmt          *sql.Stmt
-	deleteProductByIdStmt        *sql.Stmt
-	findAllFornecedoresStmt      *sql.Stmt
-	findAllORdersByCompanyidStmt *sql.Stmt
-	findClientsByCompanyidStmt   *sql.Stmt
-	findOneClientByIdStmt        *sql.Stmt
-	findOneOrderByIdStmt         *sql.Stmt
-	getAllProductsStmt           *sql.Stmt
-	getFornecedorByIDStmt        *sql.Stmt
-	getProductByIDStmt           *sql.Stmt
-	updateClientByIdStmt         *sql.Stmt
-	updateFornecedorStmt         *sql.Stmt
-	updateOneOrderStmt           *sql.Stmt
-	updateProductStmt            *sql.Stmt
+	db                                DBTX
+	tx                                *sql.Tx
+	createClientStmt                  *sql.Stmt
+	createFornecedorStmt              *sql.Stmt
+	createOrderStmt                   *sql.Stmt
+	createProductStmt                 *sql.Stmt
+	createProductOrderStmt            *sql.Stmt
+	deleteFornecedorByIdStmt          *sql.Stmt
+	deleteOneClientStmt               *sql.Stmt
+	deleteOrderByIdStmt               *sql.Stmt
+	deleteProductByIdStmt             *sql.Stmt
+	findAllFornecedoresStmt           *sql.Stmt
+	findAllORdersByCompanyidStmt      *sql.Stmt
+	findAllProductOrdersByOrderIdStmt *sql.Stmt
+	findClientsByCompanyidStmt        *sql.Stmt
+	findOneClientByIdStmt             *sql.Stmt
+	findOneOrderByIdStmt              *sql.Stmt
+	getAllProductsStmt                *sql.Stmt
+	getFornecedorByIDStmt             *sql.Stmt
+	getProductByIDStmt                *sql.Stmt
+	updateClientByIdStmt              *sql.Stmt
+	updateFornecedorStmt              *sql.Stmt
+	updateOneOrderStmt                *sql.Stmt
+	updateProductStmt                 *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                           tx,
-		tx:                           tx,
-		createClientStmt:             q.createClientStmt,
-		createFornecedorStmt:         q.createFornecedorStmt,
-		createOrderStmt:              q.createOrderStmt,
-		createProductStmt:            q.createProductStmt,
-		createProductOrderStmt:       q.createProductOrderStmt,
-		deleteFornecedorByIdStmt:     q.deleteFornecedorByIdStmt,
-		deleteOneClientStmt:          q.deleteOneClientStmt,
-		deleteOrderByIdStmt:          q.deleteOrderByIdStmt,
-		deleteProductByIdStmt:        q.deleteProductByIdStmt,
-		findAllFornecedoresStmt:      q.findAllFornecedoresStmt,
-		findAllORdersByCompanyidStmt: q.findAllORdersByCompanyidStmt,
-		findClientsByCompanyidStmt:   q.findClientsByCompanyidStmt,
-		findOneClientByIdStmt:        q.findOneClientByIdStmt,
-		findOneOrderByIdStmt:         q.findOneOrderByIdStmt,
-		getAllProductsStmt:           q.getAllProductsStmt,
-		getFornecedorByIDStmt:        q.getFornecedorByIDStmt,
-		getProductByIDStmt:           q.getProductByIDStmt,
-		updateClientByIdStmt:         q.updateClientByIdStmt,
-		updateFornecedorStmt:         q.updateFornecedorStmt,
-		updateOneOrderStmt:           q.updateOneOrderStmt,
-		updateProductStmt:            q.updateProductStmt,
+		db:                                tx,
+		tx:                                tx,
+		createClientStmt:                  q.createClientStmt,
+		createFornecedorStmt:              q.createFornecedorStmt,
+		createOrderStmt:                   q.createOrderStmt,
+		createProductStmt:                 q.createProductStmt,
+		createProductOrderStmt:            q.createProductOrderStmt,
+		deleteFornecedorByIdStmt:          q.deleteFornecedorByIdStmt,
+		deleteOneClientStmt:               q.deleteOneClientStmt,
+		deleteOrderByIdStmt:               q.deleteOrderByIdStmt,
+		deleteProductByIdStmt:             q.deleteProductByIdStmt,
+		findAllFornecedoresStmt:           q.findAllFornecedoresStmt,
+		findAllORdersByCompanyidStmt:      q.findAllORdersByCompanyidStmt,
+		findAllProductOrdersByOrderIdStmt: q.findAllProductOrdersByOrderIdStmt,
+		findClientsByCompanyidStmt:        q.findClientsByCompanyidStmt,
+		findOneClientByIdStmt:             q.findOneClientByIdStmt,
+		findOneOrderByIdStmt:              q.findOneOrderByIdStmt,
+		getAllProductsStmt:                q.getAllProductsStmt,
+		getFornecedorByIDStmt:             q.getFornecedorByIDStmt,
+		getProductByIDStmt:                q.getProductByIDStmt,
+		updateClientByIdStmt:              q.updateClientByIdStmt,
+		updateFornecedorStmt:              q.updateFornecedorStmt,
+		updateOneOrderStmt:                q.updateOneOrderStmt,
+		updateProductStmt:                 q.updateProductStmt,
 	}
 }

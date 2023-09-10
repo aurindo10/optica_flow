@@ -143,3 +143,7 @@ SELECT $3, $4, $1, $2
 FROM valid_product, valid_order
 WHERE valid_product.id IS NOT NULL AND valid_order.id IS NOT NULL
 RETURNING *;
+
+
+-- name: FindAllProductOrdersByOrderId :many
+SELECT * FROM product_order WHERE order_id = $1 ORDER BY id ASC;

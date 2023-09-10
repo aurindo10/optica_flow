@@ -30,6 +30,22 @@ func (c *ProductOrderRepository) Create(p *productorder.ProductOrder) (*producto
 	}
 	return response, nil
 }
+func (c *ProductOrderRepository) FindByOrderId(id *string) ([]*productorder.ProductOrder, error){
+	result, err := c.db.FindAllProductOrdersByOrderId(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+	var response []*productorder.ProductOrder
+	for _, v := range result {
+		response = append(response, &productorder.ProductOrder{
+			ID: v.ID,
+			ProductID: v.ProductID,
+			OrderID: v.OrderID,
+			Amout: v.Amout,
+		})
+	}
+	return response, nil
+}
 
 func NewProductOrderRepository(db *database.Queries) *ProductOrderRepository {
 	return &ProductOrderRepository{
