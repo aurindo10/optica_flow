@@ -147,3 +147,10 @@ RETURNING *;
 
 -- name: FindAllProductOrdersByOrderId :many
 SELECT * FROM product_order WHERE order_id = $1 ORDER BY id ASC;
+
+-- name: UpdateProductOrder :one
+UPDATE product_order
+SET
+  amout = COALESCE(sqlc.narg('amout'), amout)
+WHERE id = $1
+RETURNING id, amout, product_id, order_id;

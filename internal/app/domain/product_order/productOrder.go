@@ -14,6 +14,10 @@ type ProductOrderParms struct {
 	ProductID *string   `json:"product_id"`
 	OrderID   *string   `json:"order_id"`
 }
+type ProductOrderToUpdate struct {
+	ID        uuid.UUID `json:"id"`
+	Amout     *int32     `json:"amout"`
+}
 
 func NewProductOrder(product *ProductOrderParms) *ProductOrder {
 	return &ProductOrder{

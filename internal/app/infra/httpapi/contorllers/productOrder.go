@@ -8,7 +8,8 @@ import (
 
 type ProductOrderController struct {
 	createProductOrder *productorder.CreateProductOrder
-	findByOrderId *productorder.FindByOrderId 
+	findByOrderId *productorder.FindByOrderId
+	updateProductOrder *productorder.UpdateProductOrder 
 }
 
 func (r *ProductOrderController) Create(c *fiber.Ctx) error {
@@ -50,10 +51,23 @@ func (r *ProductOrderController) FindByOrderId(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
+func (r *ProductOrderController) UpdateProductOrderById(c *fiber.Ctx) error {
+	var p *productorder.ProductOrderToUpdate
+	if err := c.BodyParser(&p); err != nil {
+		return err
+	}
+	result, error := r.updateProductOrder.Execute(p)
+	if error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "order não encontrada"})
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
 
-func NewProductOrderController(createProductOrder *productorder.CreateProductOrder, findByOrderId *productorder.FindByOrderId ) *ProductOrderController {
+func NewProductOrderController(createProductOrder *productorder.CreateProductOrder,
+	 findByOrderId *productorder.FindByOrderId, updateProductOrder *productorder.UpdateProductOrder) *ProductOrderController {
 	return &ProductOrderController{
 		createProductOrder: createProductOrder,
 		findByOrderId: findByOrderId,
+		updateProductOrder: updateProductOrder,
 	}
 }
