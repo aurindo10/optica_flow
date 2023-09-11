@@ -4,6 +4,8 @@ import (
 	"context"
 	productorder "optica_flow/internal/app/domain/product_order"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 
@@ -62,6 +64,13 @@ func (c *ProductOrderRepository) UpdateProductOrder(p *productorder.ProductOrder
 		Amout: result.Amout,
 	}
 	return response, nil
+}
+func (c *ProductOrderRepository) DeleteProductOrder(id uuid.UUID) error {
+	error := c.db.DeleteProductOrderById(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
 }
 func NewProductOrderRepository(db *database.Queries) *ProductOrderRepository {
 	return &ProductOrderRepository{

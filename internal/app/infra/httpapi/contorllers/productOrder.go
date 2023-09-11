@@ -4,12 +4,14 @@ import (
 	productorder "optica_flow/internal/app/domain/product_order"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type ProductOrderController struct {
 	createProductOrder *productorder.CreateProductOrder
 	findByOrderId *productorder.FindByOrderId
-	updateProductOrder *productorder.UpdateProductOrder 
+	updateProductOrder *productorder.UpdateProductOrder
+	deleteProductOrder *productorder.DeleteProductOrder 
 }
 
 func (r *ProductOrderController) Create(c *fiber.Ctx) error {
@@ -62,12 +64,26 @@ func (r *ProductOrderController) UpdateProductOrderById(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
+func (r *ProductOrderController) DeleteProductOrderById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "id inválido"})
+	}
+	err := r.deleteProductOrder.Execute(idParsed)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "order não encontrada"})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "product order deletada"})
+}
 
 func NewProductOrderController(createProductOrder *productorder.CreateProductOrder,
-	 findByOrderId *productorder.FindByOrderId, updateProductOrder *productorder.UpdateProductOrder) *ProductOrderController {
+	 findByOrderId *productorder.FindByOrderId, updateProductOrder *productorder.UpdateProductOrder,
+	deleteProductOrder *productorder.DeleteProductOrder) *ProductOrderController {
 	return &ProductOrderController{
 		createProductOrder: createProductOrder,
 		findByOrderId: findByOrderId,
 		updateProductOrder: updateProductOrder,
+		deleteProductOrder: deleteProductOrder,
 	}
 }

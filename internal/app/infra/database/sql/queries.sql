@@ -154,3 +154,6 @@ SET
   amout = COALESCE(sqlc.narg('amout'), amout)
 WHERE id = $1
 RETURNING id, amout, product_id, order_id;
+
+-- name: DeleteProductOrderById :exec
+DELETE FROM product_order WHERE id = $1;

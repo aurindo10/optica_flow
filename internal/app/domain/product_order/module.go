@@ -7,5 +7,6 @@ var Module = fx.Provide(
 	NewCreateProductOrder,
 	NewFindByOrderId,
 	NewUpdateProductOrder,
+	NewDeleteProductOrder,
 )
 
