@@ -7,4 +7,5 @@ type Repository interface {
 	FindByOrderId(orderId *string) ([]*ProductOrder, error)
 	UpdateProductOrder(p *ProductOrderToUpdate) (*ProductOrder, error)
 	DeleteProductOrder(id uuid.UUID) error
+	FindById(id uuid.UUID) (*ProductOrder, error)
 }

@@ -157,3 +157,6 @@ RETURNING id, amout, product_id, order_id;
 
 -- name: DeleteProductOrderById :exec
 DELETE FROM product_order WHERE id = $1;
+
+-- name: FindProductOrderById :one
+SELECT * FROM product_order WHERE id = $1 LIMIT 1;

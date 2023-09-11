@@ -15,6 +15,7 @@ func (c *ProductOrderRouter) Load(r *fiber.App) {
 	r.Get("/productorder/order/:id", c.controller.FindByOrderId)
 	r.Put("/productorder", c.controller.UpdateProductOrderById)
 	r.Delete("/productorder/:id", c.controller.DeleteProductOrderById)
+	r.Get("/productorder/:id", c.controller.FindById)
 }
 
 func NewProductOrderRouter(controller *controllers.ProductOrderController) *ProductOrderRouter{

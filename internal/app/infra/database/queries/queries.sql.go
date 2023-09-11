@@ -506,6 +506,22 @@ func (q *Queries) FindOneOrderById(ctx context.Context, id uuid.UUID) (Orders, e
 	return i, err
 }
 
+const findProductOrderById = `-- name: FindProductOrderById :one
+SELECT id, amout, product_id, order_id FROM product_order WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) FindProductOrderById(ctx context.Context, id uuid.UUID) (ProductOrder, error) {
+	row := q.queryRow(ctx, q.findProductOrderByIdStmt, findProductOrderById, id)
+	var i ProductOrder
+	err := row.Scan(
+		&i.ID,
+		&i.Amout,
+		&i.ProductID,
+		&i.OrderID,
+	)
+	return i, err
+}
+
 const getAllProducts = `-- name: GetAllProducts :many
 SELECT id, name, price, fornecedor_id, description, brand, created_at, updated_at, bar_code, quantity, company_id, who_created_id, who_updated_id FROM product WHERE company_id = $1 ORDER BY id ASC
 `

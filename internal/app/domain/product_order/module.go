@@ -8,5 +8,6 @@ var Module = fx.Provide(
 	NewFindByOrderId,
 	NewUpdateProductOrder,
 	NewDeleteProductOrder,
+	NewFindByIdRequest,
 )
 

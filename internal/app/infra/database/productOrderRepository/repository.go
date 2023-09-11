@@ -72,6 +72,19 @@ func (c *ProductOrderRepository) DeleteProductOrder(id uuid.UUID) error {
 	}
 	return nil
 }
+func (c *ProductOrderRepository) FindById(id uuid.UUID) (*productorder.ProductOrder, error) {
+	result, error := c.db.FindProductOrderById(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	response := &productorder.ProductOrder{
+		ID: result.ID,
+		ProductID: result.ProductID,
+		OrderID: result.OrderID,
+		Amout: result.Amout,
+	}
+	return response, nil
+}
 func NewProductOrderRepository(db *database.Queries) *ProductOrderRepository {
 	return &ProductOrderRepository{
 		db: db,

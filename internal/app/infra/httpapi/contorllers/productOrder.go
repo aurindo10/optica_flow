@@ -11,7 +11,8 @@ type ProductOrderController struct {
 	createProductOrder *productorder.CreateProductOrder
 	findByOrderId *productorder.FindByOrderId
 	updateProductOrder *productorder.UpdateProductOrder
-	deleteProductOrder *productorder.DeleteProductOrder 
+	deleteProductOrder *productorder.DeleteProductOrder
+	findById *productorder.FindById 
 }
 
 func (r *ProductOrderController) Create(c *fiber.Ctx) error {
@@ -76,14 +77,29 @@ func (r *ProductOrderController) DeleteProductOrderById(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "product order deletada"})
 }
-
+func (r *ProductOrderController) FindById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if len(id) == 0 {
+		return fiber.NewError(400, "ID is required")
+	}
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "id inválido"})
+	}
+	result, error := r.findById.Execute(idParsed)
+	if error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "order não encontrada"})
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
 func NewProductOrderController(createProductOrder *productorder.CreateProductOrder,
 	 findByOrderId *productorder.FindByOrderId, updateProductOrder *productorder.UpdateProductOrder,
-	deleteProductOrder *productorder.DeleteProductOrder) *ProductOrderController {
+	deleteProductOrder *productorder.DeleteProductOrder, findById *productorder.FindById ) *ProductOrderController {
 	return &ProductOrderController{
 		createProductOrder: createProductOrder,
 		findByOrderId: findByOrderId,
 		updateProductOrder: updateProductOrder,
 		deleteProductOrder: deleteProductOrder,
+		findById: findById,
 	}
 }
