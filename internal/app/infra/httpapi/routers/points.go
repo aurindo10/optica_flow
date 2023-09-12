@@ -11,6 +11,7 @@ type PointsRouter struct {
 }
 func (c *PointsRouter) Load(r *fiber.App) {
 	r.Post("/point", c.controller.CreatePoints)
+	r.Get("/point/seller/:id", c.controller.FindBySeller)
 }
 func NewPointsRouter(controller *controllers.PointsController) *PointsRouter{
 	return &PointsRouter{

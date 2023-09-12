@@ -559,6 +559,45 @@ func (q *Queries) FindOneOrderById(ctx context.Context, id uuid.UUID) (Orders, e
 	return i, err
 }
 
+const findPointsBySellerId = `-- name: FindPointsBySellerId :many
+SELECT id, name, description, active, ammount, created_at, updated_at, valid_date, company_id, seller_id, order_id FROM points WHERE seller_id = $1 ORDER BY id ASC
+`
+
+func (q *Queries) FindPointsBySellerId(ctx context.Context, sellerID string) ([]Points, error) {
+	rows, err := q.query(ctx, q.findPointsBySellerIdStmt, findPointsBySellerId, sellerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Points
+	for rows.Next() {
+		var i Points
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Active,
+			&i.Ammount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ValidDate,
+			&i.CompanyID,
+			&i.SellerID,
+			&i.OrderID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findProductOrderById = `-- name: FindProductOrderById :one
 SELECT id, amout, product_id, order_id FROM product_order WHERE id = $1 LIMIT 1
 `

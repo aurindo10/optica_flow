@@ -43,7 +43,29 @@ func (c *PointsRepository) Create(p *points.Points) (*points.Points, error){
 	}
 	return response, nil
 }
-
+func (c *PointsRepository) FindBySellerId(id string) ([]*points.Points, error) {
+	result, error := c.db.FindPointsBySellerId(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	var allPoints []*points.Points
+	for _, one := range result {
+		allPoints = append(allPoints, &points.Points{
+			ID: one.ID,
+			Name: one.Name,
+			Description: one.Description,
+			Active: one.Active,
+			Ammount: one.Ammount,
+			CreatedAt: one.CreatedAt,
+			UpdatedAt: one.UpdatedAt,
+			ValidDate: one.ValidDate,
+			CompanyID: one.CompanyID,
+			OrderID: one.OrderID,
+			SellerID: one.SellerID,
+		})
+	}
+	return allPoints, nil
+}
 func NewPointsRepository(db *database.Queries) *PointsRepository {
 	return &PointsRepository{
 		db: db,

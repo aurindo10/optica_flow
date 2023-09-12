@@ -167,3 +167,6 @@ updated_at, valid_date, company_id, order_id, seller_id)
 SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 WHERE EXISTS (SELECT 1 FROM orders WHERE id = $10)
 RETURNING *;
+
+-- name: FindPointsBySellerId :many
+SELECT * FROM points WHERE seller_id = $1 ORDER BY id ASC;

@@ -8,6 +8,7 @@ import (
 
 type PointsController struct {
 	CreatPoint *points.CreatePoints
+	FindBySellerId *points.FindBySellerId
 }
 
 func (r *PointsController) CreatePoints(c *fiber.Ctx) error {
@@ -26,10 +27,21 @@ func (r *PointsController) CreatePoints(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(result)
 }
-
-func NewPointsController(CreatPoint *points.CreatePoints) *PointsController {
+func (r *PointsController) FindBySeller(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if len(id) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "id é obrigatório"})
+	}
+	result, error := r.FindBySellerId.Execute(id)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "houve um erro ao tentar obter os pontos"})
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
+func NewPointsController(CreatPoint *points.CreatePoints, FindBySellerId *points.FindBySellerId) *PointsController {
 	return &PointsController{
 		CreatPoint: CreatPoint,
+		FindBySellerId: FindBySellerId,
 	}
 }
 
