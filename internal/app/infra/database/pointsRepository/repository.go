@@ -4,6 +4,8 @@ import (
 	"context"
 	"optica_flow/internal/app/domain/points"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 
@@ -65,6 +67,13 @@ func (c *PointsRepository) FindBySellerId(id string) ([]*points.Points, error) {
 		})
 	}
 	return allPoints, nil
+}
+func (c *PointsRepository) DeletePoints(id uuid.UUID) error {
+	error := c.db.DeletePointsById(context.Background(), id)
+	if error != nil {
+		return error 
+	}
+	return nil
 }
 func NewPointsRepository(db *database.Queries) *PointsRepository {
 	return &PointsRepository{

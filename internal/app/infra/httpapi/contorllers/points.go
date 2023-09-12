@@ -4,11 +4,13 @@ import (
 	"optica_flow/internal/app/domain/points"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type PointsController struct {
 	CreatPoint *points.CreatePoints
 	FindBySellerId *points.FindBySellerId
+	DeletePointsById *points.DeletePoints
 }
 
 func (r *PointsController) CreatePoints(c *fiber.Ctx) error {
@@ -38,10 +40,29 @@ func (r *PointsController) FindBySeller(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
-func NewPointsController(CreatPoint *points.CreatePoints, FindBySellerId *points.FindBySellerId) *PointsController {
+func (r *PointsController) DeletePoints(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "id is required",
+		})
+	}
+	err := r.DeletePointsById.Execute(idParsed)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "something went wrong",
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "deletado com sucesso"})
+}
+func NewPointsController(CreatPoint *points.CreatePoints, FindBySellerId *points.FindBySellerId,
+	DeletePointsById *points.DeletePoints,
+	) *PointsController {
 	return &PointsController{
 		CreatPoint: CreatPoint,
 		FindBySellerId: FindBySellerId,
+		DeletePointsById: DeletePointsById,
 	}
 }
 

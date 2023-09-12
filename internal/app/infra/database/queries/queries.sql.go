@@ -343,6 +343,15 @@ func (q *Queries) DeleteOrderById(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const deletePointsById = `-- name: DeletePointsById :exec
+DELETE FROM points WHERE id = $1
+`
+
+func (q *Queries) DeletePointsById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deletePointsByIdStmt, deletePointsById, id)
+	return err
+}
+
 const deleteProductById = `-- name: DeleteProductById :exec
 DELETE FROM product
 WHERE id = $1

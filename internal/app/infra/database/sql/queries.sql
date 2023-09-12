@@ -170,3 +170,6 @@ RETURNING *;
 
 -- name: FindPointsBySellerId :many
 SELECT * FROM points WHERE seller_id = $1 ORDER BY id ASC;
+
+-- name: DeletePointsById :exec
+DELETE FROM points WHERE id = $1;
