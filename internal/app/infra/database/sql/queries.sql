@@ -173,3 +173,9 @@ SELECT * FROM points WHERE seller_id = $1 ORDER BY id ASC;
 
 -- name: DeletePointsById :exec
 DELETE FROM points WHERE id = $1;
+
+-- name: CreateTradePdrouct :one
+INSERT INTO trade_product (id, name, description, created_at,
+updated_at, company_id, point_ammount, image_url, who_created_id)
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9
+RETURNING *;

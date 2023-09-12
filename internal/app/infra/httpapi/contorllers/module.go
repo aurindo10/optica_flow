@@ -9,4 +9,5 @@ var Module = fx.Provide(
 	NewOrderController,
 	NewProductOrderController,
 	NewPointsController,
+	NewTradeProductController,
 )

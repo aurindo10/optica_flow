@@ -10,4 +10,5 @@ var Module = fx.Provide(
 	NewOrderRouter,
 	NewProductOrderRouter,
 	NewPointsRouter,
+	NewTradeProductController,
 )

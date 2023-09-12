@@ -315,6 +315,52 @@ func (q *Queries) CreateProductOrder(ctx context.Context, arg CreateProductOrder
 	return i, err
 }
 
+const createTradePdrouct = `-- name: CreateTradePdrouct :one
+INSERT INTO trade_product (id, name, description, created_at,
+updated_at, company_id, point_ammount, image_url, who_created_id)
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9
+RETURNING id, name, description, created_at, updated_at, company_id, point_ammount, image_url, who_created_id
+`
+
+type CreateTradePdrouctParams struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	CompanyID    string    `json:"company_id"`
+	PointAmmount int32     `json:"point_ammount"`
+	ImageUrl     *string   `json:"image_url"`
+	WhoCreatedID string    `json:"who_created_id"`
+}
+
+func (q *Queries) CreateTradePdrouct(ctx context.Context, arg CreateTradePdrouctParams) (TradeProduct, error) {
+	row := q.queryRow(ctx, q.createTradePdrouctStmt, createTradePdrouct,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.CompanyID,
+		arg.PointAmmount,
+		arg.ImageUrl,
+		arg.WhoCreatedID,
+	)
+	var i TradeProduct
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.CompanyID,
+		&i.PointAmmount,
+		&i.ImageUrl,
+		&i.WhoCreatedID,
+	)
+	return i, err
+}
+
 const deleteFornecedorById = `-- name: DeleteFornecedorById :exec
 DELETE FROM fornecedor
 WHERE id = $1
