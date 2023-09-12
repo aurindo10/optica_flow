@@ -160,3 +160,10 @@ DELETE FROM product_order WHERE id = $1;
 
 -- name: FindProductOrderById :one
 SELECT * FROM product_order WHERE id = $1 LIMIT 1;
+
+-- name: CreatePoints :one
+INSERT INTO points (id, name, description, active, ammount, created_at,
+updated_at, valid_date, company_id, order_id)
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+WHERE EXISTS (SELECT 1 FROM orders WHERE id = $10)
+RETURNING *;

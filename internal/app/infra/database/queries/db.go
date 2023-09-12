@@ -33,6 +33,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createOrderStmt, err = db.PrepareContext(ctx, createOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateOrder: %w", err)
 	}
+	if q.createPointsStmt, err = db.PrepareContext(ctx, createPoints); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePoints: %w", err)
+	}
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
 	}
@@ -117,6 +120,11 @@ func (q *Queries) Close() error {
 	if q.createOrderStmt != nil {
 		if cerr := q.createOrderStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createOrderStmt: %w", cerr)
+		}
+	}
+	if q.createPointsStmt != nil {
+		if cerr := q.createPointsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPointsStmt: %w", cerr)
 		}
 	}
 	if q.createProductStmt != nil {
@@ -271,6 +279,7 @@ type Queries struct {
 	createClientStmt                  *sql.Stmt
 	createFornecedorStmt              *sql.Stmt
 	createOrderStmt                   *sql.Stmt
+	createPointsStmt                  *sql.Stmt
 	createProductStmt                 *sql.Stmt
 	createProductOrderStmt            *sql.Stmt
 	deleteFornecedorByIdStmt          *sql.Stmt
@@ -302,6 +311,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createClientStmt:                  q.createClientStmt,
 		createFornecedorStmt:              q.createFornecedorStmt,
 		createOrderStmt:                   q.createOrderStmt,
+		createPointsStmt:                  q.createPointsStmt,
 		createProductStmt:                 q.createProductStmt,
 		createProductOrderStmt:            q.createProductOrderStmt,
 		deleteFornecedorByIdStmt:          q.deleteFornecedorByIdStmt,

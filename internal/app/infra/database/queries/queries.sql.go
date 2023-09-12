@@ -165,6 +165,56 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 	return i, err
 }
 
+const createPoints = `-- name: CreatePoints :one
+INSERT INTO points (id, name, description, active, ammount, created_at,
+updated_at, valid_date, company_id, order_id)
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+WHERE EXISTS (SELECT 1 FROM orders WHERE id = $10)
+RETURNING id, name, description, active, ammount, created_at, updated_at, valid_date, company_id, order_id
+`
+
+type CreatePointsParams struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Active      bool      `json:"active"`
+	Ammount     float64   `json:"ammount"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	ValidDate   time.Time `json:"valid_date"`
+	CompanyID   string    `json:"company_id"`
+	OrderID     *string   `json:"order_id"`
+}
+
+func (q *Queries) CreatePoints(ctx context.Context, arg CreatePointsParams) (Points, error) {
+	row := q.queryRow(ctx, q.createPointsStmt, createPoints,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.Active,
+		arg.Ammount,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.ValidDate,
+		arg.CompanyID,
+		arg.OrderID,
+	)
+	var i Points
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Active,
+		&i.Ammount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ValidDate,
+		&i.CompanyID,
+		&i.OrderID,
+	)
+	return i, err
+}
+
 const createProduct = `-- name: CreateProduct :one
 WITH valid_fornecedor AS (
   SELECT id

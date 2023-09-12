@@ -2,7 +2,6 @@ package fornecedorrepository
 
 import (
 	"context"
-	"fmt"
 	"optica_flow/internal/app/domain/fornecedor"
 	database "optica_flow/internal/app/infra/database/queries"
 
@@ -45,7 +44,6 @@ func (f *FornecedorRepository) CreateFornecedor(params *fornecedor.Fornecedor) (
 	return response, nil
 }
 func (c * FornecedorRepository) GetFornecedorById(id uuid.UUID) (*fornecedor.Fornecedor, error) {
-	fmt.Printf("GetFornecedorById: %v\n", id)
 	p, error := c.db.GetFornecedorByID(context.Background(), id)
 	if error != nil {
 		return nil, error
