@@ -72,6 +72,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findAllProductOrdersByOrderIdStmt, err = db.PrepareContext(ctx, findAllProductOrdersByOrderId); err != nil {
 		return nil, fmt.Errorf("error preparing query FindAllProductOrdersByOrderId: %w", err)
 	}
+	if q.findAllTradeProductsStmt, err = db.PrepareContext(ctx, findAllTradeProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query FindAllTradeProducts: %w", err)
+	}
 	if q.findClientsByCompanyidStmt, err = db.PrepareContext(ctx, findClientsByCompanyid); err != nil {
 		return nil, fmt.Errorf("error preparing query FindClientsByCompanyid: %w", err)
 	}
@@ -196,6 +199,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing findAllProductOrdersByOrderIdStmt: %w", cerr)
 		}
 	}
+	if q.findAllTradeProductsStmt != nil {
+		if cerr := q.findAllTradeProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findAllTradeProductsStmt: %w", cerr)
+		}
+	}
 	if q.findClientsByCompanyidStmt != nil {
 		if cerr := q.findClientsByCompanyidStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findClientsByCompanyidStmt: %w", cerr)
@@ -316,6 +324,7 @@ type Queries struct {
 	findAllFornecedoresStmt           *sql.Stmt
 	findAllORdersByCompanyidStmt      *sql.Stmt
 	findAllProductOrdersByOrderIdStmt *sql.Stmt
+	findAllTradeProductsStmt          *sql.Stmt
 	findClientsByCompanyidStmt        *sql.Stmt
 	findOneClientByIdStmt             *sql.Stmt
 	findOneOrderByIdStmt              *sql.Stmt
@@ -351,6 +360,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		findAllFornecedoresStmt:           q.findAllFornecedoresStmt,
 		findAllORdersByCompanyidStmt:      q.findAllORdersByCompanyidStmt,
 		findAllProductOrdersByOrderIdStmt: q.findAllProductOrdersByOrderIdStmt,
+		findAllTradeProductsStmt:          q.findAllTradeProductsStmt,
 		findClientsByCompanyidStmt:        q.findClientsByCompanyidStmt,
 		findOneClientByIdStmt:             q.findOneClientByIdStmt,
 		findOneOrderByIdStmt:              q.findOneOrderByIdStmt,

@@ -179,3 +179,7 @@ INSERT INTO trade_product (id, name, description, created_at,
 updated_at, company_id, point_ammount, image_url, who_created_id)
 SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9
 RETURNING *;
+
+
+-- name: FindAllTradeProducts :many
+SELECT * FROM trade_product WHERE company_id = $1 ORDER BY created_at;

@@ -12,6 +12,7 @@ type TradeProductController struct {
 
 func (c *TradeProductController) Load(r *fiber.App) {
 	r.Post("/tradeproduct", c.controller.CreateTradeProduct)
+	r.Get("/tradeproduct/company/:id", c.controller.FindAllTradeProducts)
 }
 
 func NewTradeProductController(controller *controllers.TradeProductController) *TradeProductController {

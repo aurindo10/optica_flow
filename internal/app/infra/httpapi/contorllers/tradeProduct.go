@@ -9,6 +9,7 @@ import (
 
 type TradeProductController struct {
 	createTradeProduct *tradeproduct.CreateTradeProduct
+	findAllTradeProducts *tradeproduct.FindAllRepository
 }
 
 func (f *TradeProductController) CreateTradeProduct(c *fiber.Ctx) error {
@@ -25,10 +26,23 @@ func (f *TradeProductController) CreateTradeProduct(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 } 
-
-func NewTradeProductController(createTradeProduct *tradeproduct.CreateTradeProduct) *TradeProductController {
+func (r *TradeProductController) FindAllTradeProducts(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if len(id) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "id é obrigatório",
+		})
+	}
+	result, error := r.findAllTradeProducts.Execute(id)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message":"error interno ao tentar obter os produ†os de troca"})
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
+func NewTradeProductController(createTradeProduct *tradeproduct.CreateTradeProduct, findAllTradeProducts *tradeproduct.FindAllRepository) *TradeProductController {
 	return &TradeProductController{
 		createTradeProduct: createTradeProduct,
+		findAllTradeProducts: findAllTradeProducts,
 	}
 }
 
