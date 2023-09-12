@@ -119,6 +119,7 @@ type Points struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 	ValidDate   time.Time `json:"valid_date"`
 	CompanyID   string    `json:"company_id"`
+	SellerID    string    `json:"seller_id"`
 	OrderID     *string   `json:"order_id"`
 }
 

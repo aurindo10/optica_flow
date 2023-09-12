@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS points(
   updated_at timestamp NOT NULL,
   valid_date timestamp NOT NULL,
   company_id varchar(255) NOT NULL,
+  seller_id varchar(255) NOT NULL,
   order_id uuid REFERENCES orders(id) ON DELETE CASCADE,
   CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id)
 );

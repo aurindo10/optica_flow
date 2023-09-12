@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"optica_flow/internal/app/domain/points"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +12,6 @@ type PointsController struct {
 
 func (r *PointsController) CreatePoints(c *fiber.Ctx) error {
 	var request points.PointsParams
-	fmt.Printf("GetFornecedorById: %v\n", request.Active)
 	error := c.BodyParser(&request)
 	if error != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Error ao obter informações"})
@@ -50,6 +48,9 @@ func (r *PointsController) Validate(p *points.PointsParams) error {
 	}
 	if p.ValidDate.IsZero() {
 		return fiber.NewError(400, "Data de validade é obrigatório")
+	}
+	if p.SellerID == "" {
+		return fiber.NewError(400, "id do usuário é obrigatório")
 	}
 	return nil
 }

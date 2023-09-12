@@ -2,7 +2,6 @@ package pointsrepository
 
 import (
 	"context"
-	"fmt"
 	"optica_flow/internal/app/domain/points"
 	database "optica_flow/internal/app/infra/database/queries"
 )
@@ -13,7 +12,6 @@ type PointsRepository struct {
 }
 
 func (c *PointsRepository) Create(p *points.Points) (*points.Points, error){
-	fmt.Printf("GetFornecedorById: %v\n", p.OrderID)
 	request := database.CreatePointsParams{
 		ID: p.ID,
 		Name: p.Name,
@@ -23,6 +21,8 @@ func (c *PointsRepository) Create(p *points.Points) (*points.Points, error){
 		ValidDate: p.ValidDate,
 		CompanyID: p.CompanyID,
 		OrderID: p.OrderID,
+		SellerID: p.SellerID,
+		
 	}
 	result, error := c.db.CreatePoints(context.Background(), request)
 	if error != nil {
@@ -39,6 +39,7 @@ func (c *PointsRepository) Create(p *points.Points) (*points.Points, error){
 		ValidDate: result.ValidDate,
 		CompanyID: result.CompanyID,
 		OrderID: result.OrderID,
+		SellerID: result.SellerID,
 	}
 	return response, nil
 }

@@ -18,6 +18,7 @@ type Points struct {
 	ValidDate   time.Time `json:"valid_date"`
 	CompanyID   string    `json:"company_id"`
 	OrderID     *string   `json:"order_id"`
+	SellerID    string    `json:"seller_id"`
 }
 type PointsParams struct {
 	ID          uuid.UUID `json:"id"`
@@ -30,6 +31,7 @@ type PointsParams struct {
 	ValidDate   time.Time `json:"valid_date"`
 	CompanyID   string    `json:"company_id"`
 	OrderID     string   `json:"order_id"`
+	SellerID    string    `json:"seller_id"`
 }
 
 func NewPoints(p *PointsParams) *Points {
@@ -44,5 +46,6 @@ func NewPoints(p *PointsParams) *Points {
 		ValidDate: p.ValidDate,
 		CompanyID: p.CompanyID,
 		OrderID: &p.OrderID,
+		SellerID: p.SellerID,
 	}
 }

@@ -167,10 +167,10 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 
 const createPoints = `-- name: CreatePoints :one
 INSERT INTO points (id, name, description, active, ammount, created_at,
-updated_at, valid_date, company_id, order_id)
-SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+updated_at, valid_date, company_id, order_id, seller_id)
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 WHERE EXISTS (SELECT 1 FROM orders WHERE id = $10)
-RETURNING id, name, description, active, ammount, created_at, updated_at, valid_date, company_id, order_id
+RETURNING id, name, description, active, ammount, created_at, updated_at, valid_date, company_id, seller_id, order_id
 `
 
 type CreatePointsParams struct {
@@ -184,6 +184,7 @@ type CreatePointsParams struct {
 	ValidDate   time.Time `json:"valid_date"`
 	CompanyID   string    `json:"company_id"`
 	OrderID     *string   `json:"order_id"`
+	SellerID    string    `json:"seller_id"`
 }
 
 func (q *Queries) CreatePoints(ctx context.Context, arg CreatePointsParams) (Points, error) {
@@ -198,6 +199,7 @@ func (q *Queries) CreatePoints(ctx context.Context, arg CreatePointsParams) (Poi
 		arg.ValidDate,
 		arg.CompanyID,
 		arg.OrderID,
+		arg.SellerID,
 	)
 	var i Points
 	err := row.Scan(
@@ -210,6 +212,7 @@ func (q *Queries) CreatePoints(ctx context.Context, arg CreatePointsParams) (Poi
 		&i.UpdatedAt,
 		&i.ValidDate,
 		&i.CompanyID,
+		&i.SellerID,
 		&i.OrderID,
 	)
 	return i, err
