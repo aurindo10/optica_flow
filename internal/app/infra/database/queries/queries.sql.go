@@ -417,6 +417,15 @@ func (q *Queries) DeleteProductOrderById(ctx context.Context, id uuid.UUID) erro
 	return err
 }
 
+const deleteTradeProductById = `-- name: DeleteTradeProductById :exec
+DELETE FROM trade_product WHERE id = $1
+`
+
+func (q *Queries) DeleteTradeProductById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deleteTradeProductByIdStmt, deleteTradeProductById, id)
+	return err
+}
+
 const findAllFornecedores = `-- name: FindAllFornecedores :many
 SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor WHERE company_id = $1 ORDER BY id ASC
 `

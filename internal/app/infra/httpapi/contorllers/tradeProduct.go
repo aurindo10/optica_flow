@@ -5,12 +5,14 @@ import (
 	tradeproduct "optica_flow/internal/app/domain/trade_product"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type TradeProductController struct {
 	createTradeProduct *tradeproduct.CreateTradeProduct
 	findAllTradeProducts *tradeproduct.FindAllRepository
 	updateTradeProduct *tradeproduct.UpdateTradeProduct
+	deleteTradeProduct *tradeproduct.DeleteTradeProduct
 }
 
 func (f *TradeProductController) CreateTradeProduct(c *fiber.Ctx) error {
@@ -51,13 +53,32 @@ func (r *TradeProductController) UpdateTradeProduct(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
+func (r *TradeProductController) DeleteTradeProduct( c *fiber.Ctx) error {
+	id := c.Params("id")
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
+		
+	}
+	err := r.deleteTradeProduct.Execute(idParsed)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":"Deletado com sucesso",
+	})
+
+}
 func NewTradeProductController(createTradeProduct *tradeproduct.CreateTradeProduct,
 	updateTradeProduct *tradeproduct.UpdateTradeProduct,
+	deleteTradeProduct *tradeproduct.DeleteTradeProduct,
 	findAllTradeProducts *tradeproduct.FindAllRepository) *TradeProductController {
 	return &TradeProductController{
 		createTradeProduct: createTradeProduct,
 		findAllTradeProducts: findAllTradeProducts,
 		updateTradeProduct: updateTradeProduct,
+		deleteTradeProduct: deleteTradeProduct,
 	}
 }
 

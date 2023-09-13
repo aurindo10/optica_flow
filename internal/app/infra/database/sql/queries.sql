@@ -194,3 +194,6 @@ SET
   image_url = COALESCE(sqlc.narg('image_url'), image_url)
 WHERE id = $1
 RETURNING id, name, description, created_at, updated_at, company_id, point_ammount, image_url, who_created_id;
+
+-- name: DeleteTradeProductById :exec
+DELETE FROM trade_product WHERE id = $1;

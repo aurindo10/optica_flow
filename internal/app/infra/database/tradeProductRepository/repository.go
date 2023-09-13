@@ -5,6 +5,8 @@ import (
 	tradeproduct "optica_flow/internal/app/domain/trade_product"
 	database "optica_flow/internal/app/infra/database/queries"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type TradeProductRepository struct {
@@ -87,6 +89,13 @@ func (c *TradeProductRepository) Update(p *tradeproduct.TradeProducToUpdate) (*t
 		WhoCreatedID: result.WhoCreatedID,
 	}
 	return &response, nil
+}
+func (c *TradeProductRepository) Delete(id uuid.UUID) error {
+	error := c.db.DeleteTradeProductById(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
 }
 func NewTradeProductRepository(db *database.Queries) *TradeProductRepository {
 	return &TradeProductRepository{
