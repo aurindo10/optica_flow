@@ -114,6 +114,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateProductOrderStmt, err = db.PrepareContext(ctx, updateProductOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateProductOrder: %w", err)
 	}
+	if q.updateTradeProductStmt, err = db.PrepareContext(ctx, updateTradeProduct); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateTradeProduct: %w", err)
+	}
 	return &q, nil
 }
 
@@ -269,6 +272,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateProductOrderStmt: %w", cerr)
 		}
 	}
+	if q.updateTradeProductStmt != nil {
+		if cerr := q.updateTradeProductStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateTradeProductStmt: %w", cerr)
+		}
+	}
 	return err
 }
 
@@ -338,6 +346,7 @@ type Queries struct {
 	updateOneOrderStmt                *sql.Stmt
 	updateProductStmt                 *sql.Stmt
 	updateProductOrderStmt            *sql.Stmt
+	updateTradeProductStmt            *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -374,5 +383,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateOneOrderStmt:                q.updateOneOrderStmt,
 		updateProductStmt:                 q.updateProductStmt,
 		updateProductOrderStmt:            q.updateProductOrderStmt,
+		updateTradeProductStmt:            q.updateTradeProductStmt,
 	}
 }

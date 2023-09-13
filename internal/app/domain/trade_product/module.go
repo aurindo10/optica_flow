@@ -6,4 +6,5 @@ var Module = fx.Provide(
 	NewTradeProduct,
 	NewCreateCreateTradeProduct,
 	NewFindAllRepository,
+	NewUpdateTradeProduct,
 )

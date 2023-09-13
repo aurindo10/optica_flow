@@ -10,6 +10,7 @@ import (
 type TradeProductController struct {
 	createTradeProduct *tradeproduct.CreateTradeProduct
 	findAllTradeProducts *tradeproduct.FindAllRepository
+	updateTradeProduct *tradeproduct.UpdateTradeProduct
 }
 
 func (f *TradeProductController) CreateTradeProduct(c *fiber.Ctx) error {
@@ -39,10 +40,24 @@ func (r *TradeProductController) FindAllTradeProducts(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
-func NewTradeProductController(createTradeProduct *tradeproduct.CreateTradeProduct, findAllTradeProducts *tradeproduct.FindAllRepository) *TradeProductController {
+func (r *TradeProductController) UpdateTradeProduct(c *fiber.Ctx) error {
+	var request tradeproduct.TradeProducToUpdate
+	if error := c.BodyParser(&request); error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
+	}
+	result, error := r.updateTradeProduct.Execute(&request)
+	if  error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
+func NewTradeProductController(createTradeProduct *tradeproduct.CreateTradeProduct,
+	updateTradeProduct *tradeproduct.UpdateTradeProduct,
+	findAllTradeProducts *tradeproduct.FindAllRepository) *TradeProductController {
 	return &TradeProductController{
 		createTradeProduct: createTradeProduct,
 		findAllTradeProducts: findAllTradeProducts,
+		updateTradeProduct: updateTradeProduct,
 	}
 }
 

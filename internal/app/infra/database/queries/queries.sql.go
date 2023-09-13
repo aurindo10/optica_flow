@@ -1039,3 +1039,48 @@ func (q *Queries) UpdateProductOrder(ctx context.Context, arg UpdateProductOrder
 	)
 	return i, err
 }
+
+const updateTradeProduct = `-- name: UpdateTradeProduct :one
+UPDATE trade_product
+SET 
+  name = COALESCE($2, name),
+  description = COALESCE($3, description),
+  updated_at = COALESCE($4, updated_at),
+  point_ammount = COALESCE($5, point_ammount),
+  image_url = COALESCE($6, image_url)
+WHERE id = $1
+RETURNING id, name, description, created_at, updated_at, company_id, point_ammount, image_url, who_created_id
+`
+
+type UpdateTradeProductParams struct {
+	ID           uuid.UUID  `json:"id"`
+	Name         *string    `json:"name"`
+	Description  *string    `json:"description"`
+	UpdatedAt    *time.Time `json:"updated_at"`
+	PointAmmount *int32     `json:"point_ammount"`
+	ImageUrl     *string    `json:"image_url"`
+}
+
+func (q *Queries) UpdateTradeProduct(ctx context.Context, arg UpdateTradeProductParams) (TradeProduct, error) {
+	row := q.queryRow(ctx, q.updateTradeProductStmt, updateTradeProduct,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.UpdatedAt,
+		arg.PointAmmount,
+		arg.ImageUrl,
+	)
+	var i TradeProduct
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.CompanyID,
+		&i.PointAmmount,
+		&i.ImageUrl,
+		&i.WhoCreatedID,
+	)
+	return i, err
+}

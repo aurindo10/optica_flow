@@ -4,6 +4,7 @@ import (
 	"context"
 	tradeproduct "optica_flow/internal/app/domain/trade_product"
 	database "optica_flow/internal/app/infra/database/queries"
+	"time"
 )
 
 type TradeProductRepository struct {
@@ -60,7 +61,33 @@ func (c *TradeProductRepository) FindAll(id string) ([]*tradeproduct.TradeProduc
 	}
 	return response, nil
 }
-
+func (c *TradeProductRepository) Update(p *tradeproduct.TradeProducToUpdate) (*tradeproduct.TradeProduct, error) {
+	timeNow := time.Now()
+	request := database.UpdateTradeProductParams{
+		ID: p.ID,
+		Name: p.Name,
+		Description: p.Description,
+		UpdatedAt: &timeNow,
+		PointAmmount: p.PointAmmount,
+		ImageUrl: p.ImageUrl,
+	}
+	result, error := c.db.UpdateTradeProduct(context.Background(), request)
+	if error != nil {
+		return nil, error
+	}
+	response := tradeproduct.TradeProduct{
+		ID: result.ID,
+		Name: result.Name,
+		Description: result.Description,
+		CreatedAt: result.CreatedAt,
+		UpdatedAt: result.UpdatedAt,
+		CompanyID: result.CompanyID,
+		PointAmmount: result.PointAmmount,
+		ImageUrl: result.ImageUrl,
+		WhoCreatedID: result.WhoCreatedID,
+	}
+	return &response, nil
+}
 func NewTradeProductRepository(db *database.Queries) *TradeProductRepository {
 	return &TradeProductRepository{
 		db: db,

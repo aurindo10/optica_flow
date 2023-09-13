@@ -28,6 +28,16 @@ type TradeProductParams struct {
 	ImageUrl     *string   `json:"image_url"`
 	WhoCreatedID string    `json:"who_created_id"`
 }
+type TradeProducToUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	Name         *string    `json:"name"`
+	Description  *string    `json:"description"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	PointAmmount *int32     `json:"point_ammount"`
+	ImageUrl     *string   `json:"image_url"`
+}
+
+
 
 func NewTradeProduct(p *TradeProductParams) *TradeProduct {
 	return &TradeProduct{
@@ -42,3 +52,4 @@ func NewTradeProduct(p *TradeProductParams) *TradeProduct {
 		WhoCreatedID: p.WhoCreatedID,
 	}
 }
+

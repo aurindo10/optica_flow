@@ -183,3 +183,14 @@ RETURNING *;
 
 -- name: FindAllTradeProducts :many
 SELECT * FROM trade_product WHERE company_id = $1 ORDER BY created_at;
+
+-- name: UpdateTradeProduct :one
+UPDATE trade_product
+SET 
+  name = COALESCE(sqlc.narg('name'), name),
+  description = COALESCE(sqlc.narg('description'), description),
+  updated_at = COALESCE(sqlc.narg('updated_at'), updated_at),
+  point_ammount = COALESCE(sqlc.narg('point_ammount'), point_ammount),
+  image_url = COALESCE(sqlc.narg('image_url'), image_url)
+WHERE id = $1
+RETURNING id, name, description, created_at, updated_at, company_id, point_ammount, image_url, who_created_id;
