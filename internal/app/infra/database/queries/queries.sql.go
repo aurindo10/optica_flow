@@ -71,6 +71,55 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 	return i, err
 }
 
+const createComission = `-- name: CreateComission :one
+INSERT INTO commission (id, name, description, created_at, updated_at, company_id, who_created_id, who_updated_id, order_id, value )
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+WHERE EXISTS (SELECT 1 FROM orders WHERE id = $9)
+RETURNING id, name, description, created_at, updated_at, company_id, who_created_id, who_updated_id, order_id, value
+`
+
+type CreateComissionParams struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	OrderID      *string   `json:"order_id"`
+	Value        float64   `json:"value"`
+}
+
+func (q *Queries) CreateComission(ctx context.Context, arg CreateComissionParams) (Commission, error) {
+	row := q.queryRow(ctx, q.createComissionStmt, createComission,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.CompanyID,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
+		arg.OrderID,
+		arg.Value,
+	)
+	var i Commission
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.OrderID,
+		&i.Value,
+	)
+	return i, err
+}
+
 const createFornecedor = `-- name: CreateFornecedor :one
 INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)

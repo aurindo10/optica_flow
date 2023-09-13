@@ -197,3 +197,10 @@ RETURNING id, name, description, created_at, updated_at, company_id, point_ammou
 
 -- name: DeleteTradeProductById :exec
 DELETE FROM trade_product WHERE id = $1;
+
+
+-- name: CreateComission :one
+INSERT INTO commission (id, name, description, created_at, updated_at, company_id, who_created_id, who_updated_id, order_id, value )
+SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+WHERE EXISTS (SELECT 1 FROM orders WHERE id = $9)
+RETURNING *;
