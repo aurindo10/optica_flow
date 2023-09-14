@@ -1,6 +1,9 @@
 package routers_test
 
 import (
+	"bytes"
+	"io"
+	"net/http/httptest"
 	"optica_flow/internal/app/domain/client"
 	"optica_flow/internal/app/domain/comission"
 	"optica_flow/internal/app/domain/fornecedor"
@@ -22,11 +25,12 @@ import (
 	"optica_flow/internal/app/infra/httpapi/routers"
 	"testing"
 
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 )
 func TestClient(t *testing.T) {
-	var p *routers.TestClient
+	var server *fiber.App
 	app := fxtest.New(t,
 		product.Module,
 		database.TestModule,
@@ -47,21 +51,35 @@ func TestClient(t *testing.T) {
 		tradeproductrepository.Module,
 		comission.Module,
 		comissionrepository.Module,
-		routers.TestClientModel,
-		fx.Populate(&p),
+		fx.Populate(&server),
 	)
 
 	app.RequireStart()
 	defer app.RequireStop()
-	t.Run("Test Status Code", func(t *testing.T) {
-		if p.Res != nil {
-			t.Logf("Status code: %d", *p.Res)
+	t.Run("Test Create Client", func(t *testing.T) {
+		req := httptest.NewRequest("POST", "/client", bytes.NewBufferString(`{
+			"full_name": "Seu Nome",
+			"telefone": "Seu Telefone",
+			"email": "seu.email@exemplo.com",
+			"cpf": "608.078.413-07",
+			"birth_date": "2000-01-01T00:00:00Z",
+			"adress": "Seu Endereço",
+			"gender": "Seu Gênero",
+			"city": "Sua Cidade",
+			"seller_id": "ID do Vendedor",
+			"company_id": "dasdasdasdas",
+			"who_created_id": "ID de Quem Criou",
+			"who_updated_id": "ID de Quem Atualizou"
+		  }`))
+		req.Header.Set("Content-Type", "application/json")
+		res, err := server.Test(req)
+		if err != nil {
+			t.Logf("Error: %v", err)
 		}
-	})
-
-	t.Run("Test Error", func(t *testing.T) {
-		if p.Error != nil {
-			t.Logf("Error: %v", *p.Error)
+		resBodyBytes, err := io.ReadAll(res.Body)
+		t.Log(string(resBodyBytes))
+		if err != nil {
+			t.Logf("Error: %v", err)
 		}
 	})
 }
