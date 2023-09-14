@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createTradePdrouctStmt, err = db.PrepareContext(ctx, createTradePdrouct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateTradePdrouct: %w", err)
 	}
+	if q.deleteComissionByIdStmt, err = db.PrepareContext(ctx, deleteComissionById); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteComissionById: %w", err)
+	}
 	if q.deleteFornecedorByIdStmt, err = db.PrepareContext(ctx, deleteFornecedorById); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteFornecedorById: %w", err)
 	}
@@ -169,6 +172,11 @@ func (q *Queries) Close() error {
 	if q.createTradePdrouctStmt != nil {
 		if cerr := q.createTradePdrouctStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createTradePdrouctStmt: %w", cerr)
+		}
+	}
+	if q.deleteComissionByIdStmt != nil {
+		if cerr := q.deleteComissionByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteComissionByIdStmt: %w", cerr)
 		}
 	}
 	if q.deleteFornecedorByIdStmt != nil {
@@ -348,6 +356,7 @@ type Queries struct {
 	createProductStmt                 *sql.Stmt
 	createProductOrderStmt            *sql.Stmt
 	createTradePdrouctStmt            *sql.Stmt
+	deleteComissionByIdStmt           *sql.Stmt
 	deleteFornecedorByIdStmt          *sql.Stmt
 	deleteOneClientStmt               *sql.Stmt
 	deleteOrderByIdStmt               *sql.Stmt
@@ -388,6 +397,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createProductStmt:                 q.createProductStmt,
 		createProductOrderStmt:            q.createProductOrderStmt,
 		createTradePdrouctStmt:            q.createTradePdrouctStmt,
+		deleteComissionByIdStmt:           q.deleteComissionByIdStmt,
 		deleteFornecedorByIdStmt:          q.deleteFornecedorByIdStmt,
 		deleteOneClientStmt:               q.deleteOneClientStmt,
 		deleteOrderByIdStmt:               q.deleteOrderByIdStmt,

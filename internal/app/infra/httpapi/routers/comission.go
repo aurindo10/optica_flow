@@ -14,6 +14,7 @@ type ComissionRouter struct {
 func (c *ComissionRouter) Load(r *fiber.App) {
 	r.Post("/comission", c.controller.CreateComission)
 	r.Get("/comission/user/:id", c.controller.FindByUser)
+	r.Delete("/comission/:id", c.controller.DeleteComissionById)
 }
 
 func NewComissionRouter(controller *controllers.ComissionController) *ComissionRouter {

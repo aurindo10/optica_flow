@@ -410,6 +410,15 @@ func (q *Queries) CreateTradePdrouct(ctx context.Context, arg CreateTradePdrouct
 	return i, err
 }
 
+const deleteComissionById = `-- name: DeleteComissionById :exec
+DELETE FROM commission WHERE id = $1
+`
+
+func (q *Queries) DeleteComissionById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deleteComissionByIdStmt, deleteComissionById, id)
+	return err
+}
+
 const deleteFornecedorById = `-- name: DeleteFornecedorById :exec
 DELETE FROM fornecedor
 WHERE id = $1

@@ -207,3 +207,6 @@ RETURNING *;
 
 -- name: FindComissionByUserId :many
 SELECT * FROM commission WHERE who_created_id = $1 ORDER BY created_at ASC;
+
+-- name: DeleteComissionById :exec
+DELETE FROM commission WHERE id = $1;

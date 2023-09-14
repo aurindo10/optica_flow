@@ -4,6 +4,8 @@ import (
 	"context"
 	"optica_flow/internal/app/domain/comission"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 
@@ -63,6 +65,13 @@ func (c *ComissionRepository) FindByUserId(id string) ([]*comission.Commission, 
 		})
 	}
 	return comissions, nil
+}
+func (c *ComissionRepository) DeleteById(id uuid.UUID) error {
+	error := c.db.DeleteComissionById(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
 }
 func NewComissionRepository( db *database.Queries) *ComissionRepository {
 	return &ComissionRepository{
