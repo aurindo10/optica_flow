@@ -42,6 +42,28 @@ func (c *ComissionRepository) Create(p *comission.Commission) (*comission.Commis
 	}
 	return response, nil
 }
+func (c *ComissionRepository) FindByUserId(id string) ([]*comission.Commission, error){
+	result, error := c.db.FindComissionByUserId(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	var comissions []*comission.Commission
+	for _, oneComission := range result {
+		comissions = append(comissions, &comission.Commission{
+			ID: oneComission.ID,
+			Name: oneComission.Name,
+			Description: oneComission.Description,
+			CreatedAt: oneComission.CreatedAt,
+			UpdatedAt: oneComission.UpdatedAt,
+			Value: oneComission.Value,
+			CompanyID: oneComission.CompanyID,
+			WhoCreatedID: oneComission.WhoCreatedID,
+			WhoUpdatedID: oneComission.WhoUpdatedID,
+			OrderID: oneComission.OrderID,
+		})
+	}
+	return comissions, nil
+}
 func NewComissionRepository( db *database.Queries) *ComissionRepository {
 	return &ComissionRepository{
 		db: db,

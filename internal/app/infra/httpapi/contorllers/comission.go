@@ -10,6 +10,7 @@ import (
 
 type ComissionController struct {
 	Create *comission.CreateComission
+	FindByUserId *comission.FindByUserId
 }
 
 func (r *ComissionController) CreateComission(c *fiber.Ctx) error {
@@ -26,9 +27,20 @@ func (r *ComissionController) CreateComission(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(result)
 }
-func NewComissionCOntroller(Create *comission.CreateComission) *ComissionController {
+
+func (r *ComissionController) FindByUser(c *fiber.Ctx) error {
+	id := c.Params("id")
+	result, error := r.FindByUserId.Execute(id)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
+
+func NewComissionCOntroller(Create *comission.CreateComission, findByUserId *comission.FindByUserId) *ComissionController {
 	return &ComissionController{
 		Create: Create,
+		FindByUserId: findByUserId,
 	}
 }
 

@@ -661,6 +661,44 @@ func (q *Queries) FindClientsByCompanyid(ctx context.Context, companyID string) 
 	return items, nil
 }
 
+const findComissionByUserId = `-- name: FindComissionByUserId :many
+SELECT id, name, description, created_at, updated_at, company_id, who_created_id, who_updated_id, order_id, value FROM commission WHERE who_created_id = $1 ORDER BY created_at ASC
+`
+
+func (q *Queries) FindComissionByUserId(ctx context.Context, whoCreatedID string) ([]Commission, error) {
+	rows, err := q.query(ctx, q.findComissionByUserIdStmt, findComissionByUserId, whoCreatedID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Commission
+	for rows.Next() {
+		var i Commission
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.CompanyID,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
+			&i.OrderID,
+			&i.Value,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findOneClientById = `-- name: FindOneClientById :one
 SELECT id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id FROM client WHERE id = $1 LIMIT 1
 `

@@ -84,6 +84,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findClientsByCompanyidStmt, err = db.PrepareContext(ctx, findClientsByCompanyid); err != nil {
 		return nil, fmt.Errorf("error preparing query FindClientsByCompanyid: %w", err)
 	}
+	if q.findComissionByUserIdStmt, err = db.PrepareContext(ctx, findComissionByUserId); err != nil {
+		return nil, fmt.Errorf("error preparing query FindComissionByUserId: %w", err)
+	}
 	if q.findOneClientByIdStmt, err = db.PrepareContext(ctx, findOneClientById); err != nil {
 		return nil, fmt.Errorf("error preparing query FindOneClientById: %w", err)
 	}
@@ -228,6 +231,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing findClientsByCompanyidStmt: %w", cerr)
 		}
 	}
+	if q.findComissionByUserIdStmt != nil {
+		if cerr := q.findComissionByUserIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findComissionByUserIdStmt: %w", cerr)
+		}
+	}
 	if q.findOneClientByIdStmt != nil {
 		if cerr := q.findOneClientByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findOneClientByIdStmt: %w", cerr)
@@ -352,6 +360,7 @@ type Queries struct {
 	findAllProductOrdersByOrderIdStmt *sql.Stmt
 	findAllTradeProductsStmt          *sql.Stmt
 	findClientsByCompanyidStmt        *sql.Stmt
+	findComissionByUserIdStmt         *sql.Stmt
 	findOneClientByIdStmt             *sql.Stmt
 	findOneOrderByIdStmt              *sql.Stmt
 	findPointsBySellerIdStmt          *sql.Stmt
@@ -391,6 +400,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		findAllProductOrdersByOrderIdStmt: q.findAllProductOrdersByOrderIdStmt,
 		findAllTradeProductsStmt:          q.findAllTradeProductsStmt,
 		findClientsByCompanyidStmt:        q.findClientsByCompanyidStmt,
+		findComissionByUserIdStmt:         q.findComissionByUserIdStmt,
 		findOneClientByIdStmt:             q.findOneClientByIdStmt,
 		findOneOrderByIdStmt:              q.findOneOrderByIdStmt,
 		findPointsBySellerIdStmt:          q.findPointsBySellerIdStmt,

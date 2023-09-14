@@ -204,3 +204,6 @@ INSERT INTO commission (id, name, description, created_at, updated_at, company_i
 SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 WHERE EXISTS (SELECT 1 FROM orders WHERE id = $9)
 RETURNING *;
+
+-- name: FindComissionByUserId :many
+SELECT * FROM commission WHERE who_created_id = $1 ORDER BY created_at ASC;
