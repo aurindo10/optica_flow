@@ -16,6 +16,7 @@ func MakeRouter(
 	PointsRouter *PointsRouter,
 	TradeProductController *TradeProductController,
 	ComissionController *ComissionRouter,
+	ComissionValueRouter *ComissionValueRouter,
 ) *fiber.App {
 	r := fiber.New()
 	FornecedorRouter.Load(r)
@@ -26,5 +27,6 @@ func MakeRouter(
 	PointsRouter.Load(r)
 	TradeProductController.Load(r)
 	ComissionController.Load(r)
+	ComissionValueRouter.Load(r)
 	return r
 }

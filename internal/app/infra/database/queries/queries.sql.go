@@ -120,6 +120,42 @@ func (q *Queries) CreateComission(ctx context.Context, arg CreateComissionParams
 	return i, err
 }
 
+const createComissionValue = `-- name: CreateComissionValue :one
+INSERT INTO comission_values (id, percentage, company_id, who_created_id, who_updated_id, type)
+SELECT $1, $2, $3, $4, $5, $6
+RETURNING id, percentage, company_id, who_created_id, who_updated_id, type
+`
+
+type CreateComissionValueParams struct {
+	ID           uuid.UUID `json:"id"`
+	Percentage   float64   `json:"percentage"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	Type         string    `json:"type"`
+}
+
+func (q *Queries) CreateComissionValue(ctx context.Context, arg CreateComissionValueParams) (ComissionValues, error) {
+	row := q.queryRow(ctx, q.createComissionValueStmt, createComissionValue,
+		arg.ID,
+		arg.Percentage,
+		arg.CompanyID,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
+		arg.Type,
+	)
+	var i ComissionValues
+	err := row.Scan(
+		&i.ID,
+		&i.Percentage,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.Type,
+	)
+	return i, err
+}
+
 const createFornecedor = `-- name: CreateFornecedor :one
 INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)

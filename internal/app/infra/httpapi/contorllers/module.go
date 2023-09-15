@@ -11,4 +11,5 @@ var Module = fx.Provide(
 	NewPointsController,
 	NewTradeProductController,
 	NewComissionCOntroller,
+	NewComissionValueController,
 )

@@ -221,3 +221,11 @@ SET
   value =  COALESCE(sqlc.narg('value'),value)
 WHERE id = $1
 RETURNING id, name, description, created_at, updated_at, who_created_id, who_updated_id, order_id, value, company_id;
+
+
+-- name: CreateComissionValue :one
+INSERT INTO comission_values (id, percentage, company_id, who_created_id, who_updated_id, type)
+SELECT $1, $2, $3, $4, $5, $6
+RETURNING *;
+
+
