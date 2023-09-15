@@ -234,3 +234,12 @@ SELECT * FROM comission_values WHERE company_id = $1 ORDER BY type ASC;
 
 -- name: DeleteComissionValueById :exec
 DELETE FROM comission_values WHERE id = $1;
+
+-- name: UpdateComissionValue :one
+UPDATE comission_values
+SET 
+  percentage = COALESCE(sqlc.narg('percentage'), percentage),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id),
+  type = COALESCE(sqlc.narg('type'), type)
+WHERE id = $1
+RETURNING id, percentage, company_id, who_created_id, who_updated_id, type;

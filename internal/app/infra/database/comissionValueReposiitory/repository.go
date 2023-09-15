@@ -63,6 +63,27 @@ func (c *ComissionValueRepository) DeleteComission(id uuid.UUID) error {
 	}
 	return nil 
 }
+func (c *ComissionValueRepository) UpdateComissionValue(p *comissionvalue.ComissionValuesUpdate) (*comissionvalue.ComissionValues, error) {
+	request := database.UpdateComissionValueParams{
+		ID: p.ID,
+		Percentage: p.Percentage,
+		WhoUpdatedID: p.WhoUpdatedID,
+		Type: p.Type,
+	}
+	result, error := c.db.UpdateComissionValue(context.Background(), request)
+	if error != nil {
+		return nil, error 
+	}
+	response := &comissionvalue.ComissionValues{
+		ID:result.ID,
+		Percentage: result.Percentage,
+		CompanyID: result.CompanyID,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+		Type: result.Type,
+	}
+	return response, nil
+}
 func NewComissionValueRepository(db *database.Queries) *ComissionValueRepository {
 	return &ComissionValueRepository{
 		db: db,

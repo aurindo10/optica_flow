@@ -18,6 +18,13 @@ type ComissionValuesParams struct {
 	WhoUpdatedID string    `json:"who_updated_id"`
 	Type         string    `json:"type"`
 }
+type ComissionValuesUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	Percentage   *float64   `json:"percentage"`
+	CompanyID    *string    `json:"company_id"`
+	WhoUpdatedID *string    `json:"who_updated_id"`
+	Type         *string    `json:"type"`
+}
 func NewComissionValues(p *ComissionValuesParams) *ComissionValues {
 	return &ComissionValues{
 		ID: uuid.New(),

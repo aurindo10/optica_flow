@@ -13,6 +13,7 @@ type ComissionValueController struct {
 	CreateComissionValue *comissionvalue.CreateValueComission
 	FindComissionValue *comissionvalue.FindAllByCompanyId
 	DeleteComissionValue *comissionvalue.DeleteComissionValue
+	UpdateComissionValue *comissionvalue.UpdateComissionValue
 }
 
 
@@ -72,11 +73,26 @@ func (r *ComissionValueController) DeleteComissionValueById(c *fiber.Ctx) error 
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message":"deleteado com sucesso"})
 }
+func (r *ComissionValueController) UpdateValueComission(c *fiber.Ctx) error{
+	var request comissionvalue.ComissionValuesUpdate
+	if error := c.BodyParser(&request); error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": error.Error()}) 
+	}
+	result, error := r.UpdateComissionValue.Execute(&request)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": error.Error()}) 
+	}
+	return c.Status(fiber.StatusOK).JSON(result) 
+}
 func NewComissionValueController(createComissionValue *comissionvalue.CreateValueComission,
-	 FindComissionValue *comissionvalue.FindAllByCompanyId, deleteComissionValue *comissionvalue.DeleteComissionValue) *ComissionValueController {
+	FindComissionValue *comissionvalue.FindAllByCompanyId,
+	deleteComissionValue *comissionvalue.DeleteComissionValue,
+	UpdateComissionValue *comissionvalue.UpdateComissionValue,
+	) *ComissionValueController {
 	return &ComissionValueController{
 		CreateComissionValue: createComissionValue,
 		FindComissionValue: FindComissionValue,
 		DeleteComissionValue: deleteComissionValue,
+		UpdateComissionValue: UpdateComissionValue,
 	}
 }

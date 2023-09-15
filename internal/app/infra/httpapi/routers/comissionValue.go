@@ -15,6 +15,7 @@ func (c *ComissionValueRouter) Load(r *fiber.App) {
 	r.Post("/comissionvalue", c.controller.CreateValueComission)
 	r.Get("/comissionvalue/company/:id", c.controller.FindAllComissionValue)
 	r.Delete("/comissionvalue/:id", c.controller.DeleteComissionValueById)
+	r.Put("/comissionvalue", c.controller.UpdateValueComission)
 }
 
 func NewComissionValueRouter(controller *controllers.ComissionValueController) *ComissionValueRouter{
