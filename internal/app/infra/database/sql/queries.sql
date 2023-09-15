@@ -231,3 +231,6 @@ RETURNING *;
 
 -- name: FindAllComissionValue :many
 SELECT * FROM comission_values WHERE company_id = $1 ORDER BY type ASC;
+
+-- name: DeleteComissionValueById :exec
+DELETE FROM comission_values WHERE id = $1;

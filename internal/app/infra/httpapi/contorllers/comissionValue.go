@@ -5,12 +5,14 @@ import (
 	comissionvalue "optica_flow/internal/app/domain/comission_value"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 
 type ComissionValueController struct {
 	CreateComissionValue *comissionvalue.CreateValueComission
 	FindComissionValue *comissionvalue.FindAllByCompanyId
+	DeleteComissionValue *comissionvalue.DeleteComissionValue
 }
 
 
@@ -57,10 +59,24 @@ func (r *ComissionValueController) Validate(request *comissionvalue.ComissionVal
 	}
 	return nil
 }
-
-func NewComissionValueController(createComissionValue *comissionvalue.CreateValueComission, FindComissionValue *comissionvalue.FindAllByCompanyId) *ComissionValueController {
+func (r *ComissionValueController) DeleteComissionValueById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	if error := r.DeleteComissionValue.Execute(idParsed); error != nil {
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message":"deleteado com sucesso"})
+}
+func NewComissionValueController(createComissionValue *comissionvalue.CreateValueComission,
+	 FindComissionValue *comissionvalue.FindAllByCompanyId, deleteComissionValue *comissionvalue.DeleteComissionValue) *ComissionValueController {
 	return &ComissionValueController{
 		CreateComissionValue: createComissionValue,
 		FindComissionValue: FindComissionValue,
+		DeleteComissionValue: deleteComissionValue,
 	}
 }

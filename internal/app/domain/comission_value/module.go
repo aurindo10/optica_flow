@@ -7,4 +7,5 @@ var Module = fx.Provide(
 	NewComissionValues,
 	NewCreateValueComission,
 	NewFindAllByCompanyId,
+	NewDeleteComissionVAlue,
 )
