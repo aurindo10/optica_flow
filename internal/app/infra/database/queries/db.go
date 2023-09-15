@@ -24,6 +24,9 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createCashFlowEntrieStmt, err = db.PrepareContext(ctx, createCashFlowEntrie); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateCashFlowEntrie: %w", err)
+	}
 	if q.createClientStmt, err = db.PrepareContext(ctx, createClient); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateClient: %w", err)
 	}
@@ -149,6 +152,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createCashFlowEntrieStmt != nil {
+		if cerr := q.createCashFlowEntrieStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createCashFlowEntrieStmt: %w", cerr)
+		}
+	}
 	if q.createClientStmt != nil {
 		if cerr := q.createClientStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createClientStmt: %w", cerr)
@@ -388,6 +396,7 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                DBTX
 	tx                                *sql.Tx
+	createCashFlowEntrieStmt          *sql.Stmt
 	createClientStmt                  *sql.Stmt
 	createComissionStmt               *sql.Stmt
 	createComissionValueStmt          *sql.Stmt
@@ -434,6 +443,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                                tx,
 		tx:                                tx,
+		createCashFlowEntrieStmt:          q.createCashFlowEntrieStmt,
 		createClientStmt:                  q.createClientStmt,
 		createComissionStmt:               q.createComissionStmt,
 		createComissionValueStmt:          q.createComissionValueStmt,

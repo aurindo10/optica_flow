@@ -12,6 +12,48 @@ import (
 	"github.com/google/uuid"
 )
 
+const createCashFlowEntrie = `-- name: CreateCashFlowEntrie :one
+INSERT INTO cash_flow_entries (id, type, amount, description, company_id, order_id, who_created_id, who_updated_id)
+SELECT $1, $2, $3, $4, $5, $6, $7
+WHERE EXISTS (SELECT 1 FROM orders WHERE id = $5)
+RETURNING id, date, type, amount, description, company_id, order_id, who_created_id, who_updated_id
+`
+
+type CreateCashFlowEntrieParams struct {
+	ID           uuid.UUID `json:"id"`
+	Type         string    `json:"type"`
+	Amount       float64   `json:"amount"`
+	Description  string    `json:"description"`
+	CompanyID    string    `json:"company_id"`
+	OrderID      *string   `json:"order_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+}
+
+func (q *Queries) CreateCashFlowEntrie(ctx context.Context, arg CreateCashFlowEntrieParams) (CashFlowEntries, error) {
+	row := q.queryRow(ctx, q.createCashFlowEntrieStmt, createCashFlowEntrie,
+		arg.ID,
+		arg.Type,
+		arg.Amount,
+		arg.Description,
+		arg.CompanyID,
+		arg.OrderID,
+		arg.WhoCreatedID,
+	)
+	var i CashFlowEntries
+	err := row.Scan(
+		&i.ID,
+		&i.Date,
+		&i.Type,
+		&i.Amount,
+		&i.Description,
+		&i.CompanyID,
+		&i.OrderID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+	)
+	return i, err
+}
+
 const createClient = `-- name: CreateClient :one
 INSERT INTO client (id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id)
 VALUES ($1, $2, $3, $4, current_timestamp, current_timestamp, $5, $6, $7, $8, $9, $10, $11, $12, $13)

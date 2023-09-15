@@ -243,3 +243,9 @@ SET
   type = COALESCE(sqlc.narg('type'), type)
 WHERE id = $1
 RETURNING id, percentage, company_id, who_created_id, who_updated_id, type;
+
+-- name: CreateCashFlowEntrie :one
+INSERT INTO cash_flow_entries (id, type, amount, description, company_id, order_id, who_created_id, who_updated_id)
+SELECT $1, $2, $3, $4, $5, $6, $7
+WHERE EXISTS (SELECT 1 FROM orders WHERE id = $5)
+RETURNING *;
