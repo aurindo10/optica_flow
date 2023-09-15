@@ -36,7 +36,24 @@ func (c *ComissionValueRepository) Create(p*comissionvalue.ComissionValues) (*co
 	}
 	return response, nil
 }
-
+func (c *ComissionValueRepository) FindAll(id string) ([]*comissionvalue.ComissionValues, error) {
+	result, error := c.db.FindAllComissionValue(context.Background(), id)
+	if error != nil {
+		return nil, error
+	}
+	var response []*comissionvalue.ComissionValues
+	for _, value := range result {	
+		response = append(response, &comissionvalue.ComissionValues{
+			ID: value.ID,
+			Percentage: value.Percentage,
+			CompanyID: value.CompanyID,
+			WhoCreatedID: value.CompanyID,
+			WhoUpdatedID: value.WhoUpdatedID,
+			Type: value.Type,
+		})
+	}
+	return response, nil
+}
 func NewComissionValueRepository(db *database.Queries) *ComissionValueRepository {
 	return &ComissionValueRepository{
 		db: db,

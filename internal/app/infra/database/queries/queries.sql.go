@@ -520,6 +520,40 @@ func (q *Queries) DeleteTradeProductById(ctx context.Context, id uuid.UUID) erro
 	return err
 }
 
+const findAllComissionValue = `-- name: FindAllComissionValue :many
+SELECT id, percentage, company_id, who_created_id, who_updated_id, type FROM comission_values WHERE company_id = $1 ORDER BY type ASC
+`
+
+func (q *Queries) FindAllComissionValue(ctx context.Context, companyID string) ([]ComissionValues, error) {
+	rows, err := q.query(ctx, q.findAllComissionValueStmt, findAllComissionValue, companyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ComissionValues
+	for rows.Next() {
+		var i ComissionValues
+		if err := rows.Scan(
+			&i.ID,
+			&i.Percentage,
+			&i.CompanyID,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
+			&i.Type,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findAllFornecedores = `-- name: FindAllFornecedores :many
 SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor WHERE company_id = $1 ORDER BY id ASC
 `

@@ -10,6 +10,7 @@ import (
 
 type ComissionValueController struct {
 	CreateComissionValue *comissionvalue.CreateValueComission
+	FindComissionValue *comissionvalue.FindAllByCompanyId
 }
 
 
@@ -25,6 +26,15 @@ func (r *ComissionValueController) CreateValueComission(c *fiber.Ctx) error {
 		JSON(fiber.Map{"error": error.Error()})
 	}
 	result, error := r.CreateComissionValue.Execute(&comissionValue)
+	if error != nil {
+		c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"error": error.Error()})
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
+func (r *ComissionValueController) FindAllComissionValue(c *fiber.Ctx) error {
+	id := c.Params("id")
+	result, error := r.FindComissionValue.Execute(id)
 	if error != nil {
 		c.Status(fiber.StatusInternalServerError).
 			JSON(fiber.Map{"error": error.Error()})
@@ -48,8 +58,9 @@ func (r *ComissionValueController) Validate(request *comissionvalue.ComissionVal
 	return nil
 }
 
-func NewComissionValueController(createComissionValue *comissionvalue.CreateValueComission) *ComissionValueController {
+func NewComissionValueController(createComissionValue *comissionvalue.CreateValueComission, FindComissionValue *comissionvalue.FindAllByCompanyId) *ComissionValueController {
 	return &ComissionValueController{
 		CreateComissionValue: createComissionValue,
+		FindComissionValue: FindComissionValue,
 	}
 }

@@ -13,6 +13,7 @@ type ComissionValueRouter struct {
 
 func (c *ComissionValueRouter) Load(r *fiber.App) {
 	r.Post("/comissionvalue", c.controller.CreateValueComission)
+	r.Get("/comissionvalue/:id", c.controller.FindAllComissionValue)
 }
 
 func NewComissionValueRouter(controller *controllers.ComissionValueController) *ComissionValueRouter{

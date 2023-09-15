@@ -229,3 +229,5 @@ SELECT $1, $2, $3, $4, $5, $6
 RETURNING *;
 
 
+-- name: FindAllComissionValue :many
+SELECT * FROM comission_values WHERE company_id = $1 ORDER BY type ASC;
