@@ -114,6 +114,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateClientByIdStmt, err = db.PrepareContext(ctx, updateClientById); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateClientById: %w", err)
 	}
+	if q.updateComissionStmt, err = db.PrepareContext(ctx, updateComission); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateComission: %w", err)
+	}
 	if q.updateFornecedorStmt, err = db.PrepareContext(ctx, updateFornecedor); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateFornecedor: %w", err)
 	}
@@ -284,6 +287,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateClientByIdStmt: %w", cerr)
 		}
 	}
+	if q.updateComissionStmt != nil {
+		if cerr := q.updateComissionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateComissionStmt: %w", cerr)
+		}
+	}
 	if q.updateFornecedorStmt != nil {
 		if cerr := q.updateFornecedorStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateFornecedorStmt: %w", cerr)
@@ -378,6 +386,7 @@ type Queries struct {
 	getFornecedorByIDStmt             *sql.Stmt
 	getProductByIDStmt                *sql.Stmt
 	updateClientByIdStmt              *sql.Stmt
+	updateComissionStmt               *sql.Stmt
 	updateFornecedorStmt              *sql.Stmt
 	updateOneOrderStmt                *sql.Stmt
 	updateProductStmt                 *sql.Stmt
@@ -419,6 +428,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getFornecedorByIDStmt:             q.getFornecedorByIDStmt,
 		getProductByIDStmt:                q.getProductByIDStmt,
 		updateClientByIdStmt:              q.updateClientByIdStmt,
+		updateComissionStmt:               q.updateComissionStmt,
 		updateFornecedorStmt:              q.updateFornecedorStmt,
 		updateOneOrderStmt:                q.updateOneOrderStmt,
 		updateProductStmt:                 q.updateProductStmt,

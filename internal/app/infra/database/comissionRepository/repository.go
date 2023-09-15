@@ -73,6 +73,33 @@ func (c *ComissionRepository) DeleteById(id uuid.UUID) error {
 	}
 	return nil
 }
+func (c *ComissionRepository) UpdateById(p *comission.CommissionToUpdate) (*comission.Commission, error) {
+	request := database.UpdateComissionParams{
+		ID: p.ID,
+		Name: p.Name,
+		Description: p.Description,
+		UpdatedAt: &p.UpdatedAt,
+		WhoUpdatedID: p.WhoUpdatedID,
+		Value: p.Value,
+	}
+	result, error := c.db.UpdateComission(context.Background(), request)
+	if error != nil {
+		return nil, error
+	}
+	response := comission.Commission{
+		ID: result.ID,
+		Name: result.Name,
+		Description: result.Description,
+		CreatedAt: result.CreatedAt,
+		UpdatedAt: result.UpdatedAt,
+		CompanyID: result.CompanyID,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+		OrderID: result.OrderID,
+		Value: result.Value,
+	}
+	return &response, nil
+}
 func NewComissionRepository( db *database.Queries) *ComissionRepository {
 	return &ComissionRepository{
 		db: db,

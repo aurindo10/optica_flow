@@ -210,3 +210,14 @@ SELECT * FROM commission WHERE who_created_id = $1 ORDER BY created_at ASC;
 
 -- name: DeleteComissionById :exec
 DELETE FROM commission WHERE id = $1;
+
+-- name: UpdateComission :one
+UPDATE commission
+SET 
+  name = COALESCE(sqlc.narg('name'), name),
+  description = COALESCE(sqlc.narg('description'), description),
+  updated_at = COALESCE(sqlc.narg('updated_at'),updated_at),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'),who_updated_id),
+  value =  COALESCE(sqlc.narg('value'),value)
+WHERE id = $1
+RETURNING id, name, description, created_at, updated_at, who_created_id, who_updated_id, order_id, value, company_id;

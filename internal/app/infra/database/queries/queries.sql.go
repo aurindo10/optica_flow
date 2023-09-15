@@ -968,6 +968,65 @@ func (q *Queries) UpdateClientById(ctx context.Context, arg UpdateClientByIdPara
 	return i, err
 }
 
+const updateComission = `-- name: UpdateComission :one
+UPDATE commission
+SET 
+  name = COALESCE($2, name),
+  description = COALESCE($3, description),
+  updated_at = COALESCE($4,updated_at),
+  who_updated_id = COALESCE($5,who_updated_id),
+  value =  COALESCE($6,value)
+WHERE id = $1
+RETURNING id, name, description, created_at, updated_at, who_created_id, who_updated_id, order_id, value, company_id
+`
+
+type UpdateComissionParams struct {
+	ID           uuid.UUID  `json:"id"`
+	Name         *string    `json:"name"`
+	Description  *string    `json:"description"`
+	UpdatedAt    *time.Time `json:"updated_at"`
+	WhoUpdatedID *string    `json:"who_updated_id"`
+	Value        *float64   `json:"value"`
+}
+
+type UpdateComissionRow struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	OrderID      *string   `json:"order_id"`
+	Value        float64   `json:"value"`
+	CompanyID    string    `json:"company_id"`
+}
+
+func (q *Queries) UpdateComission(ctx context.Context, arg UpdateComissionParams) (UpdateComissionRow, error) {
+	row := q.queryRow(ctx, q.updateComissionStmt, updateComission,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.UpdatedAt,
+		arg.WhoUpdatedID,
+		arg.Value,
+	)
+	var i UpdateComissionRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.OrderID,
+		&i.Value,
+		&i.CompanyID,
+	)
+	return i, err
+}
+
 const updateFornecedor = `-- name: UpdateFornecedor :one
 UPDATE fornecedor 
 SET 

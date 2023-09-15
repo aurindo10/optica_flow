@@ -13,6 +13,7 @@ type ComissionController struct {
 	Create *comission.CreateComission
 	FindByUserId *comission.FindByUserId
 	DeleteById *comission.DeleteComission
+	Update *comission.UpdateComission
 }
 
 func (r *ComissionController) CreateComission(c *fiber.Ctx) error {
@@ -52,12 +53,25 @@ func (r *ComissionController) DeleteComissionById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message":"deleteado com sucesso"})
 }
 
+func (r *ComissionController) UpdateComissionById(c *fiber.Ctx) error {
+	var request comission.CommissionToUpdate
+	if error := c.BodyParser(&request); error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(error.Error())
+	}
+	result, error := r.Update.Execute(&request)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(result)
+}
 
-func NewComissionCOntroller(Create *comission.CreateComission, findByUserId *comission.FindByUserId, deleteById *comission.DeleteComission) *ComissionController {
+func NewComissionCOntroller(Create *comission.CreateComission, findByUserId *comission.FindByUserId,
+	 deleteById *comission.DeleteComission, update *comission.UpdateComission) *ComissionController {
 	return &ComissionController{
 		Create: Create,
 		FindByUserId: findByUserId,
 		DeleteById: deleteById,
+		Update: update,
 	}
 }
 

@@ -32,6 +32,14 @@ type CommissionParams struct {
 	OrderID      *string   `json:"order_id"`
 	Value        float64   `json:"value"`
 }
+type CommissionToUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	Name         *string    `json:"name"`
+	Description  *string    `json:"description"`
+	WhoUpdatedID *string    `json:"who_updated_id"`
+	Value        *float64   `json:"value"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
 
 
 func NewComission(p *CommissionParams) *Commission {
