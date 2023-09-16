@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	flowentries "optica_flow/internal/app/domain/flow_entries"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,6 +18,10 @@ func (r *FlowEntrieController) CreateFlowEntrie(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).
 		JSON(error.Error())
 	}
+	if error :=  r.Validate(&request); error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
+	}
 	result, error := r.Create.Execute(&request)
 	if error != nil {
 		return c.Status(fiber.StatusInternalServerError).
@@ -29,4 +34,26 @@ func NewFlowEntrieController(Create *flowentries.CreateFlowEntrie) *FlowEntrieCo
 	return &FlowEntrieController{
 		Create: Create,
 	}
+}
+
+
+func (r *FlowEntrieController) Validate(p*flowentries.CashFlowEntriesParams) error {
+	if p.Amount == 0.0 {
+		return errors.New("o campo amount deve ser maior que 0")
+	}
+	if p.CompanyID == "" {
+		return errors.New("o campo companyId deve é obrigatório")
+	}
+	if p.Description == ""{
+		return errors.New("o campo descrição é obrigatório")
+	}
+	if p.WhoCreatedID == "" {
+		return errors.New("o campo WhoCreatedID é obrigatório")
+
+	}
+	if p.WhoUpdatedID == "" {
+		return errors.New("o campo WhoUpdatedID é obrigatório")
+
+	}
+	return nil
 }

@@ -14,8 +14,9 @@ import (
 
 const createCashFlowEntrie = `-- name: CreateCashFlowEntrie :one
 INSERT INTO cash_flow_entries (id, type, amount, description, company_id, order_id, who_created_id, who_updated_id)
-SELECT $1, $2, $3, $4, $5, $6, $7
-WHERE EXISTS (SELECT 1 FROM orders WHERE id = $5)
+SELECT $1, $2, $3, $4, $5, $6, $7, $8
+FROM orders
+WHERE ($6::UUID IS NULL OR EXISTS (SELECT 1 FROM orders WHERE id = $6))
 RETURNING id, date, type, amount, description, company_id, order_id, who_created_id, who_updated_id
 `
 
@@ -27,6 +28,7 @@ type CreateCashFlowEntrieParams struct {
 	CompanyID    string    `json:"company_id"`
 	OrderID      *string   `json:"order_id"`
 	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
 }
 
 func (q *Queries) CreateCashFlowEntrie(ctx context.Context, arg CreateCashFlowEntrieParams) (CashFlowEntries, error) {
@@ -38,6 +40,7 @@ func (q *Queries) CreateCashFlowEntrie(ctx context.Context, arg CreateCashFlowEn
 		arg.CompanyID,
 		arg.OrderID,
 		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
 	)
 	var i CashFlowEntries
 	err := row.Scan(

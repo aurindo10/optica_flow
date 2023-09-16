@@ -19,7 +19,6 @@ type CashFlowEntries struct {
 }
 type CashFlowEntriesParams struct {
 	ID           uuid.UUID `json:"id"`
-	Date         time.Time `json:"date"`
 	Type         string    `json:"type"`
 	Amount       float64   `json:"amount"`
 	Description  string    `json:"description"`
@@ -32,7 +31,6 @@ type CashFlowEntriesParams struct {
 func NewCashFlowEntries(p *CashFlowEntriesParams) *CashFlowEntries {
 	return &CashFlowEntries{
 		ID: uuid.New(),
-		Date: p.Date,
 		Type: p.Type,
 		Amount: p.Amount,
 		Description: p.Description,
