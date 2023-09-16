@@ -976,6 +976,51 @@ func (q *Queries) GetAllProducts(ctx context.Context, companyID string) ([]Produ
 	return items, nil
 }
 
+const getCashFlowEntriesByDateRangeAndCompany = `-- name: GetCashFlowEntriesByDateRangeAndCompany :many
+SELECT id, date, type, amount, description, company_id, order_id, who_created_id, who_updated_id FROM cash_flow_entries
+WHERE date BETWEEN $1 AND $2 AND company_id = $3
+ORDER BY date
+`
+
+type GetCashFlowEntriesByDateRangeAndCompanyParams struct {
+	Date      time.Time `json:"date"`
+	Date_2    time.Time `json:"date_2"`
+	CompanyID string    `json:"company_id"`
+}
+
+func (q *Queries) GetCashFlowEntriesByDateRangeAndCompany(ctx context.Context, arg GetCashFlowEntriesByDateRangeAndCompanyParams) ([]CashFlowEntries, error) {
+	rows, err := q.query(ctx, q.getCashFlowEntriesByDateRangeAndCompanyStmt, getCashFlowEntriesByDateRangeAndCompany, arg.Date, arg.Date_2, arg.CompanyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CashFlowEntries
+	for rows.Next() {
+		var i CashFlowEntries
+		if err := rows.Scan(
+			&i.ID,
+			&i.Date,
+			&i.Type,
+			&i.Amount,
+			&i.Description,
+			&i.CompanyID,
+			&i.OrderID,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getFornecedorByID = `-- name: GetFornecedorByID :one
 SELECT id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj FROM fornecedor WHERE id = $1 LIMIT 1
 `

@@ -10,6 +10,7 @@ import (
 
 type FlowEntrieController struct {
 	Create *flowentries.CreateFlowEntrie
+	FindByDateRange *flowentries.FindByIntervalDate
 }
 
 func (r *FlowEntrieController) CreateFlowEntrie(c *fiber.Ctx) error {
@@ -30,12 +31,40 @@ func (r *FlowEntrieController) CreateFlowEntrie(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(result)
 }
 
-func NewFlowEntrieController(Create *flowentries.CreateFlowEntrie) *FlowEntrieController {
-	return &FlowEntrieController{
-		Create: Create,
+func (r *FlowEntrieController) FindByRangeDate(c *fiber.Ctx) error {
+	var request flowentries.FindByDateParams
+	if error := c.BodyParser(&request); error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
 	}
+	if request.CompanyId == "" {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(errors.New("o campo company id é obrigatório"))
+	}
+	if request.EndDate.IsZero() {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(errors.New("o campo endDate id é obrigatório"))
+	}
+	if request.InitialDate.IsZero() {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(errors.New("o campo endDate id é obrigatório"))
+	}
+	result, error := r.FindByDateRange.Execute(&request)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).
+		JSON(error.Error())
+	}
+
+	return c.Status(fiber.StatusOK).
+	JSON(result)
 }
 
+func NewFlowEntrieController(Create *flowentries.CreateFlowEntrie, FindByDateRange *flowentries.FindByIntervalDate) *FlowEntrieController {
+	return &FlowEntrieController{
+		Create: Create,
+		FindByDateRange: FindByDateRange,
+	}
+}
 
 func (r *FlowEntrieController) Validate(p*flowentries.CashFlowEntriesParams) error {
 	if p.Amount == 0.0 {

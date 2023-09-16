@@ -117,6 +117,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
 	}
+	if q.getCashFlowEntriesByDateRangeAndCompanyStmt, err = db.PrepareContext(ctx, getCashFlowEntriesByDateRangeAndCompany); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCashFlowEntriesByDateRangeAndCompany: %w", err)
+	}
 	if q.getFornecedorByIDStmt, err = db.PrepareContext(ctx, getFornecedorByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetFornecedorByID: %w", err)
 	}
@@ -307,6 +310,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getAllProductsStmt: %w", cerr)
 		}
 	}
+	if q.getCashFlowEntriesByDateRangeAndCompanyStmt != nil {
+		if cerr := q.getCashFlowEntriesByDateRangeAndCompanyStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCashFlowEntriesByDateRangeAndCompanyStmt: %w", cerr)
+		}
+	}
 	if q.getFornecedorByIDStmt != nil {
 		if cerr := q.getFornecedorByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getFornecedorByIDStmt: %w", cerr)
@@ -394,95 +402,97 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                                DBTX
-	tx                                *sql.Tx
-	createCashFlowEntrieStmt          *sql.Stmt
-	createClientStmt                  *sql.Stmt
-	createComissionStmt               *sql.Stmt
-	createComissionValueStmt          *sql.Stmt
-	createFornecedorStmt              *sql.Stmt
-	createOrderStmt                   *sql.Stmt
-	createPointsStmt                  *sql.Stmt
-	createProductStmt                 *sql.Stmt
-	createProductOrderStmt            *sql.Stmt
-	createTradePdrouctStmt            *sql.Stmt
-	deleteComissionByIdStmt           *sql.Stmt
-	deleteComissionValueByIdStmt      *sql.Stmt
-	deleteFornecedorByIdStmt          *sql.Stmt
-	deleteOneClientStmt               *sql.Stmt
-	deleteOrderByIdStmt               *sql.Stmt
-	deletePointsByIdStmt              *sql.Stmt
-	deleteProductByIdStmt             *sql.Stmt
-	deleteProductOrderByIdStmt        *sql.Stmt
-	deleteTradeProductByIdStmt        *sql.Stmt
-	findAllComissionValueStmt         *sql.Stmt
-	findAllFornecedoresStmt           *sql.Stmt
-	findAllORdersByCompanyidStmt      *sql.Stmt
-	findAllProductOrdersByOrderIdStmt *sql.Stmt
-	findAllTradeProductsStmt          *sql.Stmt
-	findClientsByCompanyidStmt        *sql.Stmt
-	findComissionByUserIdStmt         *sql.Stmt
-	findOneClientByIdStmt             *sql.Stmt
-	findOneOrderByIdStmt              *sql.Stmt
-	findPointsBySellerIdStmt          *sql.Stmt
-	findProductOrderByIdStmt          *sql.Stmt
-	getAllProductsStmt                *sql.Stmt
-	getFornecedorByIDStmt             *sql.Stmt
-	getProductByIDStmt                *sql.Stmt
-	updateClientByIdStmt              *sql.Stmt
-	updateComissionStmt               *sql.Stmt
-	updateComissionValueStmt          *sql.Stmt
-	updateFornecedorStmt              *sql.Stmt
-	updateOneOrderStmt                *sql.Stmt
-	updateProductStmt                 *sql.Stmt
-	updateProductOrderStmt            *sql.Stmt
-	updateTradeProductStmt            *sql.Stmt
+	db                                          DBTX
+	tx                                          *sql.Tx
+	createCashFlowEntrieStmt                    *sql.Stmt
+	createClientStmt                            *sql.Stmt
+	createComissionStmt                         *sql.Stmt
+	createComissionValueStmt                    *sql.Stmt
+	createFornecedorStmt                        *sql.Stmt
+	createOrderStmt                             *sql.Stmt
+	createPointsStmt                            *sql.Stmt
+	createProductStmt                           *sql.Stmt
+	createProductOrderStmt                      *sql.Stmt
+	createTradePdrouctStmt                      *sql.Stmt
+	deleteComissionByIdStmt                     *sql.Stmt
+	deleteComissionValueByIdStmt                *sql.Stmt
+	deleteFornecedorByIdStmt                    *sql.Stmt
+	deleteOneClientStmt                         *sql.Stmt
+	deleteOrderByIdStmt                         *sql.Stmt
+	deletePointsByIdStmt                        *sql.Stmt
+	deleteProductByIdStmt                       *sql.Stmt
+	deleteProductOrderByIdStmt                  *sql.Stmt
+	deleteTradeProductByIdStmt                  *sql.Stmt
+	findAllComissionValueStmt                   *sql.Stmt
+	findAllFornecedoresStmt                     *sql.Stmt
+	findAllORdersByCompanyidStmt                *sql.Stmt
+	findAllProductOrdersByOrderIdStmt           *sql.Stmt
+	findAllTradeProductsStmt                    *sql.Stmt
+	findClientsByCompanyidStmt                  *sql.Stmt
+	findComissionByUserIdStmt                   *sql.Stmt
+	findOneClientByIdStmt                       *sql.Stmt
+	findOneOrderByIdStmt                        *sql.Stmt
+	findPointsBySellerIdStmt                    *sql.Stmt
+	findProductOrderByIdStmt                    *sql.Stmt
+	getAllProductsStmt                          *sql.Stmt
+	getCashFlowEntriesByDateRangeAndCompanyStmt *sql.Stmt
+	getFornecedorByIDStmt                       *sql.Stmt
+	getProductByIDStmt                          *sql.Stmt
+	updateClientByIdStmt                        *sql.Stmt
+	updateComissionStmt                         *sql.Stmt
+	updateComissionValueStmt                    *sql.Stmt
+	updateFornecedorStmt                        *sql.Stmt
+	updateOneOrderStmt                          *sql.Stmt
+	updateProductStmt                           *sql.Stmt
+	updateProductOrderStmt                      *sql.Stmt
+	updateTradeProductStmt                      *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                                tx,
-		tx:                                tx,
-		createCashFlowEntrieStmt:          q.createCashFlowEntrieStmt,
-		createClientStmt:                  q.createClientStmt,
-		createComissionStmt:               q.createComissionStmt,
-		createComissionValueStmt:          q.createComissionValueStmt,
-		createFornecedorStmt:              q.createFornecedorStmt,
-		createOrderStmt:                   q.createOrderStmt,
-		createPointsStmt:                  q.createPointsStmt,
-		createProductStmt:                 q.createProductStmt,
-		createProductOrderStmt:            q.createProductOrderStmt,
-		createTradePdrouctStmt:            q.createTradePdrouctStmt,
-		deleteComissionByIdStmt:           q.deleteComissionByIdStmt,
-		deleteComissionValueByIdStmt:      q.deleteComissionValueByIdStmt,
-		deleteFornecedorByIdStmt:          q.deleteFornecedorByIdStmt,
-		deleteOneClientStmt:               q.deleteOneClientStmt,
-		deleteOrderByIdStmt:               q.deleteOrderByIdStmt,
-		deletePointsByIdStmt:              q.deletePointsByIdStmt,
-		deleteProductByIdStmt:             q.deleteProductByIdStmt,
-		deleteProductOrderByIdStmt:        q.deleteProductOrderByIdStmt,
-		deleteTradeProductByIdStmt:        q.deleteTradeProductByIdStmt,
-		findAllComissionValueStmt:         q.findAllComissionValueStmt,
-		findAllFornecedoresStmt:           q.findAllFornecedoresStmt,
-		findAllORdersByCompanyidStmt:      q.findAllORdersByCompanyidStmt,
-		findAllProductOrdersByOrderIdStmt: q.findAllProductOrdersByOrderIdStmt,
-		findAllTradeProductsStmt:          q.findAllTradeProductsStmt,
-		findClientsByCompanyidStmt:        q.findClientsByCompanyidStmt,
-		findComissionByUserIdStmt:         q.findComissionByUserIdStmt,
-		findOneClientByIdStmt:             q.findOneClientByIdStmt,
-		findOneOrderByIdStmt:              q.findOneOrderByIdStmt,
-		findPointsBySellerIdStmt:          q.findPointsBySellerIdStmt,
-		findProductOrderByIdStmt:          q.findProductOrderByIdStmt,
-		getAllProductsStmt:                q.getAllProductsStmt,
-		getFornecedorByIDStmt:             q.getFornecedorByIDStmt,
-		getProductByIDStmt:                q.getProductByIDStmt,
-		updateClientByIdStmt:              q.updateClientByIdStmt,
-		updateComissionStmt:               q.updateComissionStmt,
-		updateComissionValueStmt:          q.updateComissionValueStmt,
-		updateFornecedorStmt:              q.updateFornecedorStmt,
-		updateOneOrderStmt:                q.updateOneOrderStmt,
-		updateProductStmt:                 q.updateProductStmt,
-		updateProductOrderStmt:            q.updateProductOrderStmt,
-		updateTradeProductStmt:            q.updateTradeProductStmt,
+		db:                                          tx,
+		tx:                                          tx,
+		createCashFlowEntrieStmt:                    q.createCashFlowEntrieStmt,
+		createClientStmt:                            q.createClientStmt,
+		createComissionStmt:                         q.createComissionStmt,
+		createComissionValueStmt:                    q.createComissionValueStmt,
+		createFornecedorStmt:                        q.createFornecedorStmt,
+		createOrderStmt:                             q.createOrderStmt,
+		createPointsStmt:                            q.createPointsStmt,
+		createProductStmt:                           q.createProductStmt,
+		createProductOrderStmt:                      q.createProductOrderStmt,
+		createTradePdrouctStmt:                      q.createTradePdrouctStmt,
+		deleteComissionByIdStmt:                     q.deleteComissionByIdStmt,
+		deleteComissionValueByIdStmt:                q.deleteComissionValueByIdStmt,
+		deleteFornecedorByIdStmt:                    q.deleteFornecedorByIdStmt,
+		deleteOneClientStmt:                         q.deleteOneClientStmt,
+		deleteOrderByIdStmt:                         q.deleteOrderByIdStmt,
+		deletePointsByIdStmt:                        q.deletePointsByIdStmt,
+		deleteProductByIdStmt:                       q.deleteProductByIdStmt,
+		deleteProductOrderByIdStmt:                  q.deleteProductOrderByIdStmt,
+		deleteTradeProductByIdStmt:                  q.deleteTradeProductByIdStmt,
+		findAllComissionValueStmt:                   q.findAllComissionValueStmt,
+		findAllFornecedoresStmt:                     q.findAllFornecedoresStmt,
+		findAllORdersByCompanyidStmt:                q.findAllORdersByCompanyidStmt,
+		findAllProductOrdersByOrderIdStmt:           q.findAllProductOrdersByOrderIdStmt,
+		findAllTradeProductsStmt:                    q.findAllTradeProductsStmt,
+		findClientsByCompanyidStmt:                  q.findClientsByCompanyidStmt,
+		findComissionByUserIdStmt:                   q.findComissionByUserIdStmt,
+		findOneClientByIdStmt:                       q.findOneClientByIdStmt,
+		findOneOrderByIdStmt:                        q.findOneOrderByIdStmt,
+		findPointsBySellerIdStmt:                    q.findPointsBySellerIdStmt,
+		findProductOrderByIdStmt:                    q.findProductOrderByIdStmt,
+		getAllProductsStmt:                          q.getAllProductsStmt,
+		getCashFlowEntriesByDateRangeAndCompanyStmt: q.getCashFlowEntriesByDateRangeAndCompanyStmt,
+		getFornecedorByIDStmt:                       q.getFornecedorByIDStmt,
+		getProductByIDStmt:                          q.getProductByIDStmt,
+		updateClientByIdStmt:                        q.updateClientByIdStmt,
+		updateComissionStmt:                         q.updateComissionStmt,
+		updateComissionValueStmt:                    q.updateComissionValueStmt,
+		updateFornecedorStmt:                        q.updateFornecedorStmt,
+		updateOneOrderStmt:                          q.updateOneOrderStmt,
+		updateProductStmt:                           q.updateProductStmt,
+		updateProductOrderStmt:                      q.updateProductOrderStmt,
+		updateTradeProductStmt:                      q.updateTradeProductStmt,
 	}
 }

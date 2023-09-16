@@ -37,7 +37,32 @@ func (c *FlowEntriesRepository) Create(p *flowentries.CashFlowEntries) (*flowent
 	}
 	return response, nil
 }
-
+func (c *FlowEntriesRepository) FindByIntervalDate(p *flowentries.FindByDateParams) ([]*flowentries.CashFlowEntries, error){
+	request := database.GetCashFlowEntriesByDateRangeAndCompanyParams{
+		CompanyID: p.CompanyId,
+		Date: p.InitialDate,
+		Date_2: p.EndDate,
+	}
+	result, error := c.db.GetCashFlowEntriesByDateRangeAndCompany(context.Background(), request)
+	if error != nil {
+		return nil, error
+	}
+	var response []*flowentries.CashFlowEntries
+	for _, flowEntry := range result {
+		response = append(response, &flowentries.CashFlowEntries{
+			ID: flowEntry.ID,
+			Date: flowEntry.Date,
+			Type: flowEntry.Type,
+			Amount: flowEntry.Amount,
+			Description: flowEntry.Description,
+			CompanyID: flowEntry.CompanyID,
+			OrderID: flowEntry.OrderID,
+			WhoCreatedID: flowEntry.WhoCreatedID,
+			WhoUpdatedID: flowEntry.WhoUpdatedID,
+		})
+	}
+	return response, nil
+}
 func NewFlowEntrieRepository(db *database.Queries) *FlowEntriesRepository {
 	return &FlowEntriesRepository{
 		db : db,

@@ -250,3 +250,8 @@ SELECT $1, $2, $3, $4, $5, $6, $7, $8
 FROM orders
 WHERE ($6::UUID IS NULL OR EXISTS (SELECT 1 FROM orders WHERE id = $6))
 RETURNING *;
+
+-- name: GetCashFlowEntriesByDateRangeAndCompany :many
+SELECT * FROM cash_flow_entries
+WHERE date BETWEEN $1 AND $2 AND company_id = $3
+ORDER BY date;
