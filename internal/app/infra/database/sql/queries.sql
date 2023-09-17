@@ -266,3 +266,5 @@ SET
 WHERE id = $1
 RETURNING id, date, type, amount, description, company_id, order_id, who_created_id, who_updated_id;
 
+-- name: DeleteFlowEntrie :exec
+DELETE FROM cash_flow_entries WHERE id = $1;

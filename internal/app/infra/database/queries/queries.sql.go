@@ -509,6 +509,15 @@ func (q *Queries) DeleteComissionValueById(ctx context.Context, id uuid.UUID) er
 	return err
 }
 
+const deleteFlowEntrie = `-- name: DeleteFlowEntrie :exec
+DELETE FROM cash_flow_entries WHERE id = $1
+`
+
+func (q *Queries) DeleteFlowEntrie(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deleteFlowEntrieStmt, deleteFlowEntrie, id)
+	return err
+}
+
 const deleteFornecedorById = `-- name: DeleteFornecedorById :exec
 DELETE FROM fornecedor
 WHERE id = $1

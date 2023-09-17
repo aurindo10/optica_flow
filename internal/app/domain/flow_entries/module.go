@@ -8,4 +8,5 @@ var Module = fx.Provide(
 	NewCreateFlowEntrie,
 	NewFindByIntervalDate,
 	NewUpdateFlowEntrie,
+	NewDeleteFlowEntrie,
 )

@@ -5,6 +5,7 @@ import (
 	flowentries "optica_flow/internal/app/domain/flow_entries"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 
@@ -12,6 +13,7 @@ type FlowEntrieController struct {
 	Create *flowentries.CreateFlowEntrie
 	FindByDateRange *flowentries.FindByIntervalDate
 	UpdateFlowEntrie *flowentries.UpdateFlowEntrie
+	DeleteFlowEntrie *flowentries.DeleteFlowEntrie
 }
 
 func (r *FlowEntrieController) CreateFlowEntrie(c *fiber.Ctx) error {
@@ -73,13 +75,31 @@ func (r *FlowEntrieController) UpdateCashFlowEntrie(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).
 	JSON(result)
 }
+func (r *FlowEntrieController) DeleteCashFlowEntrie(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
+	}
+	err := r.DeleteFlowEntrie.Execute(idParsed)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).
+		JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).
+	JSON(fiber.Map{
+		"message":"Deletado com sucesso",
+	})
+}
 func NewFlowEntrieController(Create *flowentries.CreateFlowEntrie, FindByDateRange *flowentries.FindByIntervalDate,
-	UpdateFlowEntrie *flowentries.UpdateFlowEntrie,
+	UpdateFlowEntrie *flowentries.UpdateFlowEntrie, DeleteFlowEntrie *flowentries.DeleteFlowEntrie,
 	) *FlowEntrieController {
 	return &FlowEntrieController{
 		Create: Create,
 		FindByDateRange: FindByDateRange,
 		UpdateFlowEntrie: UpdateFlowEntrie,
+		DeleteFlowEntrie: DeleteFlowEntrie,
 	}
 }
 

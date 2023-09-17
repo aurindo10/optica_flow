@@ -4,6 +4,8 @@ import (
 	"context"
 	flowentries "optica_flow/internal/app/domain/flow_entries"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 type FlowEntriesRepository struct {
@@ -87,6 +89,13 @@ func (c *FlowEntriesRepository) Update(p *flowentries.CashFlowEntriesUpdate) (*f
 		WhoUpdatedID: result.WhoUpdatedID,
 	}
 	return response, nil 
+}
+func (c *FlowEntriesRepository) Delete(id uuid.UUID) error {
+	error := c.db.DeleteFlowEntrie(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
 }
 func NewFlowEntrieRepository(db *database.Queries) *FlowEntriesRepository {
 	return &FlowEntriesRepository{
