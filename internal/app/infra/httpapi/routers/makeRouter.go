@@ -18,6 +18,7 @@ func MakeRouter(
 	ComissionController *ComissionRouter,
 	ComissionValueRouter *ComissionValueRouter,
 	flowEntrie *FlowEntrieRouter,
+	flowBalance *FlowBalanceRouter,
 ) *fiber.App {
 	r := fiber.New()
 	FornecedorRouter.Load(r)
@@ -30,5 +31,6 @@ func MakeRouter(
 	ComissionController.Load(r)
 	ComissionValueRouter.Load(r)
 	flowEntrie.Load(r)
+	flowBalance.Load(r)
 	return r
 }

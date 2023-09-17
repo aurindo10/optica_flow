@@ -201,6 +201,63 @@ func (q *Queries) CreateComissionValue(ctx context.Context, arg CreateComissionV
 	return i, err
 }
 
+const createFlowBalance = `-- name: CreateFlowBalance :one
+
+INSERT INTO cash_flow_balance (id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description)
+SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
+FROM commission
+WHERE ($6::UUID IS NULL OR EXISTS (SELECT 1 FROM commission WHERE id = $6))
+RETURNING id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description
+`
+
+type CreateFlowBalanceParams struct {
+	ID           uuid.UUID `json:"id"`
+	Date         time.Time `json:"date"`
+	CompanyID    string    `json:"company_id"`
+	WhoCreatedID string    `json:"who_created_id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	ComissionID  *string   `json:"comission_id"`
+	DueDate      time.Time `json:"due_date"`
+	PaidDate     time.Time `json:"paid_date"`
+	Paid         bool      `json:"paid"`
+	Value        float64   `json:"value"`
+	Type         string    `json:"type"`
+	Description  string    `json:"description"`
+}
+
+func (q *Queries) CreateFlowBalance(ctx context.Context, arg CreateFlowBalanceParams) (CashFlowBalance, error) {
+	row := q.queryRow(ctx, q.createFlowBalanceStmt, createFlowBalance,
+		arg.ID,
+		arg.Date,
+		arg.CompanyID,
+		arg.WhoCreatedID,
+		arg.WhoUpdatedID,
+		arg.ComissionID,
+		arg.DueDate,
+		arg.PaidDate,
+		arg.Paid,
+		arg.Value,
+		arg.Type,
+		arg.Description,
+	)
+	var i CashFlowBalance
+	err := row.Scan(
+		&i.ID,
+		&i.Date,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.ComissionID,
+		&i.DueDate,
+		&i.PaidDate,
+		&i.Paid,
+		&i.Value,
+		&i.Type,
+		&i.Description,
+	)
+	return i, err
+}
+
 const createFornecedor = `-- name: CreateFornecedor :one
 INSERT INTO fornecedor (id, name, telefone, email, adress, company_id, who_created_id, who_updated_id, cnpj)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)

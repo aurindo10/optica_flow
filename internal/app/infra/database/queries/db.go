@@ -36,6 +36,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createComissionValueStmt, err = db.PrepareContext(ctx, createComissionValue); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateComissionValue: %w", err)
 	}
+	if q.createFlowBalanceStmt, err = db.PrepareContext(ctx, createFlowBalance); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateFlowBalance: %w", err)
+	}
 	if q.createFornecedorStmt, err = db.PrepareContext(ctx, createFornecedor); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateFornecedor: %w", err)
 	}
@@ -179,6 +182,11 @@ func (q *Queries) Close() error {
 	if q.createComissionValueStmt != nil {
 		if cerr := q.createComissionValueStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createComissionValueStmt: %w", cerr)
+		}
+	}
+	if q.createFlowBalanceStmt != nil {
+		if cerr := q.createFlowBalanceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createFlowBalanceStmt: %w", cerr)
 		}
 	}
 	if q.createFornecedorStmt != nil {
@@ -424,6 +432,7 @@ type Queries struct {
 	createClientStmt                            *sql.Stmt
 	createComissionStmt                         *sql.Stmt
 	createComissionValueStmt                    *sql.Stmt
+	createFlowBalanceStmt                       *sql.Stmt
 	createFornecedorStmt                        *sql.Stmt
 	createOrderStmt                             *sql.Stmt
 	createPointsStmt                            *sql.Stmt
@@ -474,6 +483,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createClientStmt:                            q.createClientStmt,
 		createComissionStmt:                         q.createComissionStmt,
 		createComissionValueStmt:                    q.createComissionValueStmt,
+		createFlowBalanceStmt:                       q.createFlowBalanceStmt,
 		createFornecedorStmt:                        q.createFornecedorStmt,
 		createOrderStmt:                             q.createOrderStmt,
 		createPointsStmt:                            q.createPointsStmt,

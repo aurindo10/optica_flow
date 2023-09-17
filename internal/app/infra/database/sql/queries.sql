@@ -268,3 +268,12 @@ RETURNING id, date, type, amount, description, company_id, order_id, who_created
 
 -- name: DeleteFlowEntrie :exec
 DELETE FROM cash_flow_entries WHERE id = $1;
+
+-- name: CreateFlowBalance :one
+
+INSERT INTO cash_flow_balance (id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description)
+SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
+FROM commission
+WHERE ($6::UUID IS NULL OR EXISTS (SELECT 1 FROM commission WHERE id = $6))
+RETURNING *;
+

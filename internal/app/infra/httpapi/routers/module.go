@@ -14,4 +14,5 @@ var Module = fx.Provide(
 	NewComissionRouter,
 	NewComissionValueRouter,
 	NewFlowEntrieRouter,
+	NewFlowBalanceRouter,
 )

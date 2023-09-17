@@ -1,6 +1,7 @@
 package main
 
 import (
+	cashflowout "optica_flow/internal/app/domain/cash_flow_out"
 	"optica_flow/internal/app/domain/client"
 	"optica_flow/internal/app/domain/comission"
 	comissionvalue "optica_flow/internal/app/domain/comission_value"
@@ -15,6 +16,7 @@ import (
 	clientrepository "optica_flow/internal/app/infra/database/clientRepository"
 	comissionrepository "optica_flow/internal/app/infra/database/comissionRepository"
 	comissionvaluerepository "optica_flow/internal/app/infra/database/comissionValueReposiitory"
+	flowbalancerepository "optica_flow/internal/app/infra/database/flowBalanceRepository"
 	flowentriesrepository "optica_flow/internal/app/infra/database/flowEntriesRepository"
 	fornecedorrepository "optica_flow/internal/app/infra/database/fornecedorRepository"
 	orderrepository "optica_flow/internal/app/infra/database/orderRepository"
@@ -56,6 +58,8 @@ func main() {
 		comissionvaluerepository.Module,
 		flowentries.Module,
 		flowentriesrepository.Module,
+		cashflowout.Module,
+		flowbalancerepository.Module,
 		fx.Invoke(func(*fasthttp.Server){}),
 	)
 	app.Run()
