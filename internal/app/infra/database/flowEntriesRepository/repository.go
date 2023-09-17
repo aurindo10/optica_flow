@@ -63,6 +63,31 @@ func (c *FlowEntriesRepository) FindByIntervalDate(p *flowentries.FindByDatePara
 	}
 	return response, nil
 }
+func (c *FlowEntriesRepository) Update(p *flowentries.CashFlowEntriesUpdate) (*flowentries.CashFlowEntries, error){
+	request := database.UpdateFlowEntrieParams{
+		ID: p.ID,
+		Type: p.Type,
+		Amount: p.Amount,
+		Description: p.Description,
+		WhoUpdatedID: p.WhoUpdatedID,
+	}
+	result, error := c.db.UpdateFlowEntrie(context.Background(), request)
+	if error != nil {
+		return nil, error
+	}
+	response := &flowentries.CashFlowEntries{
+		ID: result.ID,
+		Date: result.Date,
+		Type: result.Type,
+		Amount: result.Amount,
+		Description: result.Description,
+		CompanyID: result.CompanyID,
+		OrderID: result.OrderID,
+		WhoCreatedID: result.WhoCreatedID,
+		WhoUpdatedID: result.WhoUpdatedID,
+	}
+	return response, nil 
+}
 func NewFlowEntrieRepository(db *database.Queries) *FlowEntriesRepository {
 	return &FlowEntriesRepository{
 		db : db,

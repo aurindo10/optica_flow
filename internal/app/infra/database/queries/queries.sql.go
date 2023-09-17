@@ -1232,6 +1232,48 @@ func (q *Queries) UpdateComissionValue(ctx context.Context, arg UpdateComissionV
 	return i, err
 }
 
+const updateFlowEntrie = `-- name: UpdateFlowEntrie :one
+UPDATE cash_flow_entries
+SET
+  type = COALESCE($2, type),
+  amount = COALESCE($3, amount),
+  description = COALESCE($4, description),
+  who_updated_id = COALESCE($5, who_updated_id)
+WHERE id = $1
+RETURNING id, date, type, amount, description, company_id, order_id, who_created_id, who_updated_id
+`
+
+type UpdateFlowEntrieParams struct {
+	ID           uuid.UUID `json:"id"`
+	Type         *string   `json:"type"`
+	Amount       *float64  `json:"amount"`
+	Description  *string   `json:"description"`
+	WhoUpdatedID *string   `json:"who_updated_id"`
+}
+
+func (q *Queries) UpdateFlowEntrie(ctx context.Context, arg UpdateFlowEntrieParams) (CashFlowEntries, error) {
+	row := q.queryRow(ctx, q.updateFlowEntrieStmt, updateFlowEntrie,
+		arg.ID,
+		arg.Type,
+		arg.Amount,
+		arg.Description,
+		arg.WhoUpdatedID,
+	)
+	var i CashFlowEntries
+	err := row.Scan(
+		&i.ID,
+		&i.Date,
+		&i.Type,
+		&i.Amount,
+		&i.Description,
+		&i.CompanyID,
+		&i.OrderID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+	)
+	return i, err
+}
+
 const updateFornecedor = `-- name: UpdateFornecedor :one
 UPDATE fornecedor 
 SET 

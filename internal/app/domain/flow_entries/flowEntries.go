@@ -28,6 +28,13 @@ type CashFlowEntriesParams struct {
 	WhoUpdatedID string    `json:"who_updated_id"`
 }
 
+type CashFlowEntriesUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	Type         *string    `json:"type"`
+	Amount       *float64   `json:"amount"`
+	Description  *string    `json:"description"`
+	WhoUpdatedID *string    `json:"who_updated_id"`
+}
 func NewCashFlowEntries(p *CashFlowEntriesParams) *CashFlowEntries {
 	return &CashFlowEntries{
 		ID: uuid.New(),

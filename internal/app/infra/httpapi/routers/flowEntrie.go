@@ -14,6 +14,7 @@ type FlowEntrieRouter struct {
 func (c *FlowEntrieRouter) Load(r *fiber.App) {
 	r.Post("/flowentrie", c.controller.CreateFlowEntrie)
 	r.Post("/flowentrie/find-range-date", c.controller.FindByRangeDate)
+	r.Put("/flowentrie", c.controller.UpdateCashFlowEntrie)
 }
 
 func NewFlowEntrieRouter(controller *controllers.FlowEntrieController) *FlowEntrieRouter {

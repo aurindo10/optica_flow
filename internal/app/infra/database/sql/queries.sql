@@ -255,3 +255,14 @@ RETURNING *;
 SELECT * FROM cash_flow_entries
 WHERE date BETWEEN $1 AND $2 AND company_id = $3
 ORDER BY date;
+
+-- name: UpdateFlowEntrie :one
+UPDATE cash_flow_entries
+SET
+  type = COALESCE(sqlc.narg('type'), type),
+  amount = COALESCE(sqlc.narg('amount'), amount),
+  description = COALESCE(sqlc.narg('description'), description),
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id)
+WHERE id = $1
+RETURNING id, date, type, amount, description, company_id, order_id, who_created_id, who_updated_id;
+

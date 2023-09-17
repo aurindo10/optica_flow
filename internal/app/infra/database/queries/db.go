@@ -135,6 +135,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateComissionValueStmt, err = db.PrepareContext(ctx, updateComissionValue); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateComissionValue: %w", err)
 	}
+	if q.updateFlowEntrieStmt, err = db.PrepareContext(ctx, updateFlowEntrie); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateFlowEntrie: %w", err)
+	}
 	if q.updateFornecedorStmt, err = db.PrepareContext(ctx, updateFornecedor); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateFornecedor: %w", err)
 	}
@@ -340,6 +343,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateComissionValueStmt: %w", cerr)
 		}
 	}
+	if q.updateFlowEntrieStmt != nil {
+		if cerr := q.updateFlowEntrieStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateFlowEntrieStmt: %w", cerr)
+		}
+	}
 	if q.updateFornecedorStmt != nil {
 		if cerr := q.updateFornecedorStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateFornecedorStmt: %w", cerr)
@@ -441,6 +449,7 @@ type Queries struct {
 	updateClientByIdStmt                        *sql.Stmt
 	updateComissionStmt                         *sql.Stmt
 	updateComissionValueStmt                    *sql.Stmt
+	updateFlowEntrieStmt                        *sql.Stmt
 	updateFornecedorStmt                        *sql.Stmt
 	updateOneOrderStmt                          *sql.Stmt
 	updateProductStmt                           *sql.Stmt
@@ -489,6 +498,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateClientByIdStmt:                        q.updateClientByIdStmt,
 		updateComissionStmt:                         q.updateComissionStmt,
 		updateComissionValueStmt:                    q.updateComissionValueStmt,
+		updateFlowEntrieStmt:                        q.updateFlowEntrieStmt,
 		updateFornecedorStmt:                        q.updateFornecedorStmt,
 		updateOneOrderStmt:                          q.updateOneOrderStmt,
 		updateProductStmt:                           q.updateProductStmt,

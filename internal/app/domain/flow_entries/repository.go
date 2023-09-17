@@ -11,5 +11,6 @@ type FindByDateParams struct {
 type Repository interface {
 	Create(*CashFlowEntries) (*CashFlowEntries, error)
 	FindByIntervalDate(*FindByDateParams) ([]*CashFlowEntries, error)
+	Update(*CashFlowEntriesUpdate) (*CashFlowEntries, error)
 }
 

@@ -11,6 +11,7 @@ import (
 type FlowEntrieController struct {
 	Create *flowentries.CreateFlowEntrie
 	FindByDateRange *flowentries.FindByIntervalDate
+	UpdateFlowEntrie *flowentries.UpdateFlowEntrie
 }
 
 func (r *FlowEntrieController) CreateFlowEntrie(c *fiber.Ctx) error {
@@ -58,11 +59,27 @@ func (r *FlowEntrieController) FindByRangeDate(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).
 	JSON(result)
 }
-
-func NewFlowEntrieController(Create *flowentries.CreateFlowEntrie, FindByDateRange *flowentries.FindByIntervalDate) *FlowEntrieController {
+func (r *FlowEntrieController) UpdateCashFlowEntrie(c *fiber.Ctx) error {
+	var request flowentries.CashFlowEntriesUpdate
+	if error := c.BodyParser(&request) ; error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
+	}
+	result, error := r.UpdateFlowEntrie.Execute(&request)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).
+	JSON(result)
+}
+func NewFlowEntrieController(Create *flowentries.CreateFlowEntrie, FindByDateRange *flowentries.FindByIntervalDate,
+	UpdateFlowEntrie *flowentries.UpdateFlowEntrie,
+	) *FlowEntrieController {
 	return &FlowEntrieController{
 		Create: Create,
 		FindByDateRange: FindByDateRange,
+		UpdateFlowEntrie: UpdateFlowEntrie,
 	}
 }
 
