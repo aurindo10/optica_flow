@@ -144,6 +144,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateComissionValueStmt, err = db.PrepareContext(ctx, updateComissionValue); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateComissionValue: %w", err)
 	}
+	if q.updateFlowBalanceStmt, err = db.PrepareContext(ctx, updateFlowBalance); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateFlowBalance: %w", err)
+	}
 	if q.updateFlowEntrieStmt, err = db.PrepareContext(ctx, updateFlowEntrie); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateFlowEntrie: %w", err)
 	}
@@ -367,6 +370,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateComissionValueStmt: %w", cerr)
 		}
 	}
+	if q.updateFlowBalanceStmt != nil {
+		if cerr := q.updateFlowBalanceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateFlowBalanceStmt: %w", cerr)
+		}
+	}
 	if q.updateFlowEntrieStmt != nil {
 		if cerr := q.updateFlowEntrieStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateFlowEntrieStmt: %w", cerr)
@@ -476,6 +484,7 @@ type Queries struct {
 	updateClientByIdStmt                        *sql.Stmt
 	updateComissionStmt                         *sql.Stmt
 	updateComissionValueStmt                    *sql.Stmt
+	updateFlowBalanceStmt                       *sql.Stmt
 	updateFlowEntrieStmt                        *sql.Stmt
 	updateFornecedorStmt                        *sql.Stmt
 	updateOneOrderStmt                          *sql.Stmt
@@ -528,6 +537,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateClientByIdStmt:                        q.updateClientByIdStmt,
 		updateComissionStmt:                         q.updateComissionStmt,
 		updateComissionValueStmt:                    q.updateComissionValueStmt,
+		updateFlowBalanceStmt:                       q.updateFlowBalanceStmt,
 		updateFlowEntrieStmt:                        q.updateFlowEntrieStmt,
 		updateFornecedorStmt:                        q.updateFornecedorStmt,
 		updateOneOrderStmt:                          q.updateOneOrderStmt,

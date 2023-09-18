@@ -36,3 +36,8 @@ sql:
               type: "int32"
               pointer: true
             nullable: true
+          - db_type: "pg_catalog.bool"
+            go_type:
+              type: "bool"
+              pointer: true
+            nullable: true

@@ -281,3 +281,21 @@ RETURNING *;
 SELECT * FROM cash_flow_balance
 WHERE due_date BETWEEN $1 AND $2 AND company_id = $3
 ORDER BY due_date;
+
+-- name: UpdateFlowBalance :one
+UPDATE cash_flow_balance
+SET
+  who_updated_id = COALESCE(sqlc.narg('who_updated_id'), who_updated_id),
+  due_date = COALESCE(sqlc.narg('due_date'), due_date),
+  paid_date = COALESCE(sqlc.narg('paid_date'), paid_date),
+  paid = COALESCE(sqlc.narg('paid'), paid),
+  value = COALESCE(sqlc.narg('value'), value),
+  type = COALESCE(sqlc.narg('type'), type),
+  description = COALESCE(sqlc.narg('description'), description)
+WHERE id = $1
+RETURNING id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description;
+
+
+
+
+

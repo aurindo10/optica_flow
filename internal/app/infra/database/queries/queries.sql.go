@@ -1346,6 +1346,60 @@ func (q *Queries) UpdateComissionValue(ctx context.Context, arg UpdateComissionV
 	return i, err
 }
 
+const updateFlowBalance = `-- name: UpdateFlowBalance :one
+UPDATE cash_flow_balance
+SET
+  who_updated_id = COALESCE($2, who_updated_id),
+  due_date = COALESCE($3, due_date),
+  paid_date = COALESCE($4, paid_date),
+  paid = COALESCE($5, paid),
+  value = COALESCE($6, value),
+  type = COALESCE($7, type),
+  description = COALESCE($8, description)
+WHERE id = $1
+RETURNING id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description
+`
+
+type UpdateFlowBalanceParams struct {
+	ID           uuid.UUID  `json:"id"`
+	WhoUpdatedID *string    `json:"who_updated_id"`
+	DueDate      *time.Time `json:"due_date"`
+	PaidDate     *time.Time `json:"paid_date"`
+	Paid         *bool      `json:"paid"`
+	Value        *float64   `json:"value"`
+	Type         *string    `json:"type"`
+	Description  *string    `json:"description"`
+}
+
+func (q *Queries) UpdateFlowBalance(ctx context.Context, arg UpdateFlowBalanceParams) (CashFlowBalance, error) {
+	row := q.queryRow(ctx, q.updateFlowBalanceStmt, updateFlowBalance,
+		arg.ID,
+		arg.WhoUpdatedID,
+		arg.DueDate,
+		arg.PaidDate,
+		arg.Paid,
+		arg.Value,
+		arg.Type,
+		arg.Description,
+	)
+	var i CashFlowBalance
+	err := row.Scan(
+		&i.ID,
+		&i.Date,
+		&i.CompanyID,
+		&i.WhoCreatedID,
+		&i.WhoUpdatedID,
+		&i.ComissionID,
+		&i.DueDate,
+		&i.PaidDate,
+		&i.Paid,
+		&i.Value,
+		&i.Type,
+		&i.Description,
+	)
+	return i, err
+}
+
 const updateFlowEntrie = `-- name: UpdateFlowEntrie :one
 UPDATE cash_flow_entries
 SET

@@ -32,7 +32,17 @@ type CashFlowBalanceParams struct {
 	Type         string    `json:"type"`
 	Description  string    `json:"description"`
 }
-
+type CashFlowBalanceUpdate struct {
+	ID           uuid.UUID `json:"id"`
+	WhoUpdatedID string    `json:"who_updated_id"`
+	ComissionID  *string   `json:"comission_id"`
+	DueDate      *time.Time `json:"due_date"`
+	PaidDate     *time.Time `json:"paid_date"`
+	Paid         *bool      `json:"paid"`
+	Value        *float64   `json:"value"`
+	Type         *string    `json:"type"`
+	Description  *string    `json:"description"`
+}
 
 func NewCashFlowBalance(p *CashFlowBalanceParams) *CashFlowBalance {
 	return &CashFlowBalance{

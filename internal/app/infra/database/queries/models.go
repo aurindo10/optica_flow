@@ -93,7 +93,7 @@ type Fornecedor struct {
 type GooseDbVersion struct {
 	ID        int32         `json:"id"`
 	VersionID sql.NullInt64 `json:"version_id"`
-	IsApplied sql.NullBool  `json:"is_applied"`
+	IsApplied *bool         `json:"is_applied"`
 	Tstamp    *time.Time    `json:"tstamp"`
 }
 

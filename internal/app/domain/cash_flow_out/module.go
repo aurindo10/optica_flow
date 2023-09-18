@@ -8,4 +8,5 @@ var Module = fx.Provide(
 	NewCashFlowBalance,
 	NewCreateFlowBalance,
 	NewFindByRangeDate,
+	NewUpdateCashFlowBalance,
 )
