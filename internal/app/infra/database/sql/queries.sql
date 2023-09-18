@@ -295,7 +295,8 @@ SET
 WHERE id = $1
 RETURNING id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description;
 
-
+-- name: DeleteFlowBalanceById :exec
+DELETE FROM cash_flow_balance WHERE id = $1;
 
 
 

@@ -63,6 +63,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteComissionValueByIdStmt, err = db.PrepareContext(ctx, deleteComissionValueById); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteComissionValueById: %w", err)
 	}
+	if q.deleteFlowBalanceByIdStmt, err = db.PrepareContext(ctx, deleteFlowBalanceById); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteFlowBalanceById: %w", err)
+	}
 	if q.deleteFlowEntrieStmt, err = db.PrepareContext(ctx, deleteFlowEntrie); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteFlowEntrie: %w", err)
 	}
@@ -233,6 +236,11 @@ func (q *Queries) Close() error {
 	if q.deleteComissionValueByIdStmt != nil {
 		if cerr := q.deleteComissionValueByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteComissionValueByIdStmt: %w", cerr)
+		}
+	}
+	if q.deleteFlowBalanceByIdStmt != nil {
+		if cerr := q.deleteFlowBalanceByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteFlowBalanceByIdStmt: %w", cerr)
 		}
 	}
 	if q.deleteFlowEntrieStmt != nil {
@@ -457,6 +465,7 @@ type Queries struct {
 	createTradePdrouctStmt                      *sql.Stmt
 	deleteComissionByIdStmt                     *sql.Stmt
 	deleteComissionValueByIdStmt                *sql.Stmt
+	deleteFlowBalanceByIdStmt                   *sql.Stmt
 	deleteFlowEntrieStmt                        *sql.Stmt
 	deleteFornecedorByIdStmt                    *sql.Stmt
 	deleteOneClientStmt                         *sql.Stmt
@@ -510,6 +519,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createTradePdrouctStmt:                      q.createTradePdrouctStmt,
 		deleteComissionByIdStmt:                     q.deleteComissionByIdStmt,
 		deleteComissionValueByIdStmt:                q.deleteComissionValueByIdStmt,
+		deleteFlowBalanceByIdStmt:                   q.deleteFlowBalanceByIdStmt,
 		deleteFlowEntrieStmt:                        q.deleteFlowEntrieStmt,
 		deleteFornecedorByIdStmt:                    q.deleteFornecedorByIdStmt,
 		deleteOneClientStmt:                         q.deleteOneClientStmt,

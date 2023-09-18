@@ -15,6 +15,7 @@ func (c *FlowBalanceRouter) Load(r *fiber.App) {
 	r.Post("/flowbalance", c.controllers.CreateFlowBalance)
 	r.Post("/flowbalance/find-range-date", c.controllers.FindCashByRangeDate)
 	r.Put("/flowbalance", c.controllers.UpdateCashByRangeDate)
+	r.Delete("/flowbalance/:id", c.controllers.DeleteCashFlowBalance)
 }
 
 func NewFlowBalanceRouter(controllers *controllers.CashFlowBalanceController) *FlowBalanceRouter {

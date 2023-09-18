@@ -4,6 +4,8 @@ import (
 	"context"
 	cashflowout "optica_flow/internal/app/domain/cash_flow_out"
 	database "optica_flow/internal/app/infra/database/queries"
+
+	"github.com/google/uuid"
 )
 
 
@@ -108,6 +110,13 @@ func (c *FlowBalanceRepository) Update(p *cashflowout.CashFlowBalanceUpdate) (*c
 		Description: result.Description,
 	}
 	return response, nil
+}
+func (c *FlowBalanceRepository) Delete(id uuid.UUID)  error {
+	error := c.db.DeleteFlowBalanceById(context.Background(), id)
+	if error != nil {
+		return error
+	}
+	return nil
 }
 
 func NewFlowBalanceRepository(db *database.Queries) *FlowBalanceRepository {

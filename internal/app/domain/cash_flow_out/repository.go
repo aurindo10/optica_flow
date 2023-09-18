@@ -1,6 +1,10 @@
 package cashflowout
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 
 type FindByRangeDateParams struct {
@@ -12,4 +16,5 @@ type Repository interface {
 	Create(*CashFlowBalance) (*CashFlowBalance, error)
 	FindByRangeDate(*FindByRangeDateParams) ([]*CashFlowBalance, error)
 	Update(*CashFlowBalanceUpdate) (*CashFlowBalance, error)
+	Delete(id uuid.UUID) error
 }

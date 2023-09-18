@@ -5,6 +5,7 @@ import (
 	cashflowout "optica_flow/internal/app/domain/cash_flow_out"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 
@@ -12,6 +13,7 @@ type CashFlowBalanceController struct {
 	CreateCashFlowBalance *cashflowout.CreateFlowBalance
 	FindByRangeDate *cashflowout.FindByRangeDate
 	UpdateFlowBalance *cashflowout.UpdateCashFlowBalance
+	DeleteFlowBalance *cashflowout.DeleteCashFlowBalance
 }
 
 func (r *CashFlowBalanceController) CreateFlowBalance(c *fiber.Ctx)  error {
@@ -60,12 +62,30 @@ func (r *CashFlowBalanceController) UpdateCashByRangeDate(c *fiber.Ctx) error  {
 	return c.Status(fiber.StatusOK).
 	JSON(result)
 }
+func (r *CashFlowBalanceController) DeleteCashFlowBalance(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idParsed, error := uuid.Parse(id)
+	if error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
+	}
+	err := r.DeleteFlowBalance.Execute(idParsed)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).
+		JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).
+	JSON(fiber.Map{"message":"deletado com sucesso"}) 
+}
 func NewCashFlowBalanceController(CreateCashFlowBalance *cashflowout.CreateFlowBalance,
-	 FindByRangeDate *cashflowout.FindByRangeDate, UpdateFlowBalance *cashflowout.UpdateCashFlowBalance) *CashFlowBalanceController {
+	 FindByRangeDate *cashflowout.FindByRangeDate, UpdateFlowBalance *cashflowout.UpdateCashFlowBalance,
+	 DeleteFlowBalance *cashflowout.DeleteCashFlowBalance,
+	 ) *CashFlowBalanceController {
 	return &CashFlowBalanceController{
 		CreateCashFlowBalance: CreateCashFlowBalance,
 		FindByRangeDate : FindByRangeDate,
 		UpdateFlowBalance: UpdateFlowBalance,
+		DeleteFlowBalance: DeleteFlowBalance,
 	}
 }
 
