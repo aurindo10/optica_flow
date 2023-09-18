@@ -5,6 +5,7 @@ import (
 	"fmt"
 	repository "optica_flow/internal/app/infra/database/productRepository"
 	database "optica_flow/internal/app/infra/database/queries"
+	config "optica_flow/pkg"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -27,9 +28,14 @@ func NewPostgresDatabase() (*database.Queries, error ){
 func NewPostgresTestDatabase() (*database.Queries, func(), error) {
 	// Gerar um nome de banco de dados único para evitar colisões
 	tempDBName := fmt.Sprintf("test_db_%d", time.Now().Unix())
-
+	port := config.Config("PORT")
+	host := config.Config("HOST")
+	user := config.Config("DB_USER")
+	password := config.Config("DB_PASSWORD")
+	db_name := config.Config("DB_NAME")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s  TimeZone=America/Sao_Paulo",host, user, password, db_name, port)
 	// Conectar ao banco de dados principal para criar um novo banco de dados temporário
-	masterDB, err := sql.Open("postgres", "user=docker dbname=otica password=otica123 sslmode=disable host=localhost port=5432")
+	masterDB, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, nil, err
 	}
