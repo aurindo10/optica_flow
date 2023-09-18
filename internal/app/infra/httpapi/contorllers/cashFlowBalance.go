@@ -10,6 +10,7 @@ import (
 
 type CashFlowBalanceController struct {
 	CreateCashFlowBalance *cashflowout.CreateFlowBalance
+	FindByRangeDate *cashflowout.FindByRangeDate
 }
 
 func (r *CashFlowBalanceController) CreateFlowBalance(c *fiber.Ctx)  error {
@@ -30,10 +31,24 @@ func (r *CashFlowBalanceController) CreateFlowBalance(c *fiber.Ctx)  error {
 	return c.Status(fiber.StatusCreated).
 	JSON(result)
 }
-
-func NewCashFlowBalanceController(CreateCashFlowBalance *cashflowout.CreateFlowBalance) *CashFlowBalanceController {
+func (r *CashFlowBalanceController) FindCashByRangeDate(c *fiber.Ctx) error {
+	var request cashflowout.FindByRangeDateParams
+	if error := c.BodyParser(&request); error != nil {
+		return c.Status(fiber.StatusBadRequest).
+		JSON(error.Error())
+	}
+	result, error := r.FindByRangeDate.Execute(&request)
+	if error != nil {
+		return c.Status(fiber.StatusInternalServerError).
+		JSON(error.Error())
+	}
+	return c.Status(fiber.StatusOK).
+	JSON(result)
+}
+func NewCashFlowBalanceController(CreateCashFlowBalance *cashflowout.CreateFlowBalance, FindByRangeDate *cashflowout.FindByRangeDate) *CashFlowBalanceController {
 	return &CashFlowBalanceController{
 		CreateCashFlowBalance: CreateCashFlowBalance,
+		FindByRangeDate : FindByRangeDate,
 	}
 }
 

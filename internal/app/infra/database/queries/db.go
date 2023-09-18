@@ -108,6 +108,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findComissionByUserIdStmt, err = db.PrepareContext(ctx, findComissionByUserId); err != nil {
 		return nil, fmt.Errorf("error preparing query FindComissionByUserId: %w", err)
 	}
+	if q.findFlowBalanceByDateRangeStmt, err = db.PrepareContext(ctx, findFlowBalanceByDateRange); err != nil {
+		return nil, fmt.Errorf("error preparing query FindFlowBalanceByDateRange: %w", err)
+	}
 	if q.findOneClientByIdStmt, err = db.PrepareContext(ctx, findOneClientById); err != nil {
 		return nil, fmt.Errorf("error preparing query FindOneClientById: %w", err)
 	}
@@ -304,6 +307,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing findComissionByUserIdStmt: %w", cerr)
 		}
 	}
+	if q.findFlowBalanceByDateRangeStmt != nil {
+		if cerr := q.findFlowBalanceByDateRangeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findFlowBalanceByDateRangeStmt: %w", cerr)
+		}
+	}
 	if q.findOneClientByIdStmt != nil {
 		if cerr := q.findOneClientByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findOneClientByIdStmt: %w", cerr)
@@ -456,6 +464,7 @@ type Queries struct {
 	findAllTradeProductsStmt                    *sql.Stmt
 	findClientsByCompanyidStmt                  *sql.Stmt
 	findComissionByUserIdStmt                   *sql.Stmt
+	findFlowBalanceByDateRangeStmt              *sql.Stmt
 	findOneClientByIdStmt                       *sql.Stmt
 	findOneOrderByIdStmt                        *sql.Stmt
 	findPointsBySellerIdStmt                    *sql.Stmt
@@ -507,6 +516,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		findAllTradeProductsStmt:                    q.findAllTradeProductsStmt,
 		findClientsByCompanyidStmt:                  q.findClientsByCompanyidStmt,
 		findComissionByUserIdStmt:                   q.findComissionByUserIdStmt,
+		findFlowBalanceByDateRangeStmt:              q.findFlowBalanceByDateRangeStmt,
 		findOneClientByIdStmt:                       q.findOneClientByIdStmt,
 		findOneOrderByIdStmt:                        q.findOneOrderByIdStmt,
 		findPointsBySellerIdStmt:                    q.findPointsBySellerIdStmt,

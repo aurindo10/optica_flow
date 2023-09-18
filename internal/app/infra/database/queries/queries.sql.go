@@ -898,6 +898,54 @@ func (q *Queries) FindComissionByUserId(ctx context.Context, whoCreatedID string
 	return items, nil
 }
 
+const findFlowBalanceByDateRange = `-- name: FindFlowBalanceByDateRange :many
+SELECT id, date, company_id, who_created_id, who_updated_id, comission_id, due_date, paid_date, paid, value, type, description FROM cash_flow_balance
+WHERE due_date BETWEEN $1 AND $2 AND company_id = $3
+ORDER BY due_date
+`
+
+type FindFlowBalanceByDateRangeParams struct {
+	DueDate   time.Time `json:"due_date"`
+	DueDate_2 time.Time `json:"due_date_2"`
+	CompanyID string    `json:"company_id"`
+}
+
+func (q *Queries) FindFlowBalanceByDateRange(ctx context.Context, arg FindFlowBalanceByDateRangeParams) ([]CashFlowBalance, error) {
+	rows, err := q.query(ctx, q.findFlowBalanceByDateRangeStmt, findFlowBalanceByDateRange, arg.DueDate, arg.DueDate_2, arg.CompanyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CashFlowBalance
+	for rows.Next() {
+		var i CashFlowBalance
+		if err := rows.Scan(
+			&i.ID,
+			&i.Date,
+			&i.CompanyID,
+			&i.WhoCreatedID,
+			&i.WhoUpdatedID,
+			&i.ComissionID,
+			&i.DueDate,
+			&i.PaidDate,
+			&i.Paid,
+			&i.Value,
+			&i.Type,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findOneClientById = `-- name: FindOneClientById :one
 SELECT id, full_name, telefone, cpf, created_at, updated_at, email, birth_date, adress, gender, city, seller_id, company_id, who_created_id, who_updated_id FROM client WHERE id = $1 LIMIT 1
 `

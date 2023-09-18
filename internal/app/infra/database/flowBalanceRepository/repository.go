@@ -48,6 +48,36 @@ func (c *FlowBalanceRepository) Create(p *cashflowout.CashFlowBalance) (*cashflo
 	return &response, nil
 }
 
+func (c *FlowBalanceRepository) FindByRangeDate(p *cashflowout.FindByRangeDateParams) ([]*cashflowout.CashFlowBalance, error) {
+	request := database.FindFlowBalanceByDateRangeParams{
+		DueDate: p.InitialDate,
+		DueDate_2: p.EndDate,
+		CompanyID: p.CompanyId,
+	}
+	result, error := c.db.FindFlowBalanceByDateRange(context.Background(), request)
+	if error != nil {
+		return nil, error
+	}
+	var response []*cashflowout.CashFlowBalance
+	for _, item := range result {
+		response = append(response, &cashflowout.CashFlowBalance{
+			ID: item.ID,
+			Date: item.Date,
+			CompanyID: item.CompanyID,
+			WhoCreatedID: item.WhoCreatedID,
+			WhoUpdatedID: item.WhoUpdatedID,
+			ComissionID: item.ComissionID,
+			DueDate: item.DueDate,
+			PaidDate: item.PaidDate,
+			Paid: item.Paid,
+			Value: item.Value,
+			Type: item.Type,
+			Description: item.Description,
+		} )
+	}
+	return response, nil
+}
+
 func NewFlowBalanceRepository(db *database.Queries) *FlowBalanceRepository {
 	return &FlowBalanceRepository{
 		db: db,

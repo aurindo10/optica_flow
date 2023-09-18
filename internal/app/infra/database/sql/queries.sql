@@ -277,3 +277,7 @@ FROM commission
 WHERE ($6::UUID IS NULL OR EXISTS (SELECT 1 FROM commission WHERE id = $6))
 RETURNING *;
 
+-- name: FindFlowBalanceByDateRange :many
+SELECT * FROM cash_flow_balance
+WHERE due_date BETWEEN $1 AND $2 AND company_id = $3
+ORDER BY due_date;
