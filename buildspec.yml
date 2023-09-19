@@ -11,10 +11,10 @@ phases:
   build:
     commands:
       - echo Start build...
-      - go build -o app ./cmd/main.go
+      go build -o ./myGoApp ./cmd/main.go
   post_build:
     commands:
       - echo Build completed on `date`
 artifacts:
   files:
-    - app
+    - myGoApp
