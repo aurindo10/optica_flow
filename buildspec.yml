@@ -1,13 +1,24 @@
 version: 0.2
+
 phases:
+  install:
+    runtime-versions:
+      golang: 1.20
   pre_build:
     commands:
-      - echo "Installing dependencies"
+      - echo Start pre_build...
   build:
     commands:
-      - echo "Building the Go app"
-      - cd cmd
-      - go build -o myapp
+      - echo Start build...
+      - go build -o ./bin/myGoApp ./cmd/main.go
+  post_build:
+    commands:
+      - echo Start post_build...
+      - zip -r myApp.zip ./bin/myGoApp Procfile go.mod
+
 artifacts:
   files:
-    - cmd/myapp
+    - myApp.zip
+    - Procfile
+    - go.mod
+    - .ebextensions/**/*
