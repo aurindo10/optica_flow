@@ -1,3 +1,5 @@
+version: 0.2
+
 phases:
   install:
     runtime-versions:
@@ -8,14 +10,14 @@ phases:
   build:
     commands:
       - echo Start build...
-      - go build -o ./bin/myGoApp ./cmd/main.go # Mudança aqui
+      - go build -o ./bin/myGoApp ./cmd/main.go
   post_build:
     commands:
       - echo Start post_build...
-      - zip -r myApp.zip ./bin/myGoApp Procfile # E aqui
+      - zip -r myApp.zip ./bin/myGoApp Procfile
 
 artifacts:
   files:
     - myApp.zip
-    - Procfile # Adicione isso se necessário
+    - Procfile
     - .ebextensions/**/*
