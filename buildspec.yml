@@ -11,6 +11,7 @@ phases:
     commands:
       - echo Start build...
       - go build -o ./myGoApp ./cmd/main.go
+      - zip -r myApp.zip ./myGoApp Procfile
   post_build:
     commands:
       - echo Start post_build...
