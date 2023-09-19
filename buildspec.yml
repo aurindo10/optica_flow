@@ -7,10 +7,10 @@ phases:
   pre_build:
     commands:
       - echo Start pre_build...
+      - go mod tidy
   build:
     commands:
       - echo Start build...
-      - go mod init
       - go build -o ./bin/myGoApp ./cmd/main.go
   post_build:
     commands:
