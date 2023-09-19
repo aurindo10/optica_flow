@@ -1,25 +1,20 @@
 version: 0.2
-
 phases:
   install:
     runtime-versions:
       golang: 1.20
   pre_build:
     commands:
-      - echo Start pre_build...
-      - go mod tidy
+      - echo CODEBUILD_SRC_DIR - $CODEBUILD_SRC_DIR
+      - echo GOPATH - $GOPATH
+      - echo GOROOT - $GOROOT
   build:
     commands:
       - echo Start build...
-      - go build -o ./bin/myGoApp ./cmd/main.go
+      - go build -0 app ./cmd/main.go
   post_build:
     commands:
-      - echo Start post_build...
-      - zip -r myApp.zip ./bin/myGoApp Procfile go.mod
-
+      - echo Build completed on `date`
 artifacts:
   files:
-    - myApp.zip
-    - Procfile
-    - go.mod
-    - .ebextensions/**/*
+    - app
