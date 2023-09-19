@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.20
+  post_build:
+    commands:
+      - go build -o ./myGoApp ./cmd/main.go
+      - zip -r myApp.zip ./myGoApp Procfile
+
+artifacts:
+  files:
+    - myApp.zip
+    - .ebextensions/**/*
