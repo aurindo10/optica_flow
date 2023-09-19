@@ -1,1 +1,1 @@
-web: ./myGoApp
+web: ./bin/myGoApp

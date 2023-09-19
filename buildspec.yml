@@ -6,14 +6,14 @@ phases:
       golang: 1.20
   pre_build:
     commands:
-      - echo Start pre_build...
+      - echo "Start pre_build..."
   build:
     commands:
-      - echo Start build...
+      - echo "Start build..."
       - go build -o ./bin/myGoApp ./cmd/main.go
   post_build:
     commands:
-      - echo Start post_build...
+      - echo "Start post_build..."
       - zip -r myApp.zip ./bin/myGoApp Procfile go.mod
 
 artifacts:
