@@ -16,9 +16,10 @@ phases:
     commands:
       # - echo "Start post_build..."
       # - zip -r myApp.zip ./bin/myGoApp Procfile go.mod
-  artifacts:
-    files:
-      - myGoApp
-      - Procfile
-      - go.mod
-      - .ebextensions/**/*
+
+artifacts:
+  files:
+    - myGoApp
+    - Procfile
+    - go.mod
+    - .ebextensions/**/*
